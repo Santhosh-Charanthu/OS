@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>1. What is an Operating System?</title>
+<style>
+:root{color-scheme:light;--fg:#0f172a;--muted:#64748b;--border:#e2e8f0;--accent:#0284c7;--accent-soft:#e0f2fe;--card:#ffffff;--code-bg:#0f172a;--code-fg:#e2e8f0;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:linear-gradient(180deg,#e0f2fe 0%,#f0f9ff 60%,#ffffff 100%);color:var(--fg);min-height:100vh;padding:32px 16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.page{max-width:920px;margin:0 auto}
+.doc{background:var(--card);border-radius:18px;box-shadow:0 20px 60px -20px rgba(2,132,199,.25),0 4px 14px -4px rgba(15,23,42,.08);padding:clamp(24px,5vw,60px);border:1px solid rgba(148,163,184,.2)}
+.title-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin:0 0 1.2em;padding-bottom:.5em;border-bottom:1px solid var(--border)}
+.title-row h1{margin:0;padding:0;border:0;flex:1 1 auto;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;border:1px solid rgba(2,132,199,.2);white-space:nowrap;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;box-shadow:0 1px 2px rgba(2,132,199,.08);flex:0 0 auto;margin-left:auto;margin-right:8px}
+.badge:hover{background:#bae6fd;transform:translateY(-1px);box-shadow:0 6px 16px -6px rgba(2,132,199,.35)}
+h1,h2,h3,h4,h5,h6{font-weight:700;line-height:1.25;margin:1.8em 0 .6em;letter-spacing:-.01em}
+h1{font-size:2.15rem;border-bottom:1px solid var(--border);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.6rem}
+h3{font-size:1.3rem}
+h4{font-size:1.1rem}
+p{margin:.9em 0}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+strong{font-weight:700}
+del{color:var(--muted)}
+ul,ol{margin:.8em 0;padding-left:1.6em}
+li{margin:.25em 0}
+blockquote{margin:1.2em 0;padding:.5em 1.1em;border-left:4px solid var(--accent);background:var(--accent-soft);color:#334155;border-radius:0 .5rem .5rem 0}
+hr{margin:2em 0;border:0;border-top:1px solid var(--border)}
+img{max-width:100%;border-radius:.5rem;margin:1em 0}
+code{font-family:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.9em;padding:.15em .4em;background:#f1f5f9;color:#0c4a6e;border-radius:.35rem;border:1px solid var(--border)}
+pre{margin:1.2em 0;padding:1rem 1.1rem;background:var(--code-bg);color:var(--code-fg);border-radius:.7rem;overflow-x:auto;font-size:.9rem;line-height:1.55;border:1px solid #1e293b}
+pre code{background:transparent;border:0;padding:0;color:inherit;font-size:inherit}
+table{width:100%;border-collapse:separate;border-spacing:0;margin:1.2em 0;display:table;table-layout:auto;border:1px solid var(--border);border-radius:.6rem;overflow:hidden}
+thead{background:var(--accent-soft)}
+th,td{padding:.65em .9em;border-bottom:1px solid var(--border);text-align:left}
+th{font-weight:600}
+tr:last-child td{border-bottom:0}
+.callout{margin:1.5em 0;padding:1rem 1.1rem;border-radius:.8rem;border:1px solid var(--co-b,var(--border));background:var(--co-bg,#f8fafc);box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.callout-title{display:flex;align-items:center;gap:.55rem;font-weight:700;font-size:1rem;margin-bottom:.5rem;color:var(--co-fg,var(--fg))}
+.callout-icon{font-size:1.15rem;line-height:1}
+.callout-body>:first-child{margin-top:0}
+.callout-body>:last-child{margin-bottom:0}
+.callout-note{--co-bg:#eff6ff;--co-b:#bfdbfe;--co-fg:#1e40af}
+.callout-important{--co-bg:#faf5ff;--co-b:#e9d5ff;--co-fg:#6b21a8}
+.callout-warning{--co-bg:#fffbeb;--co-b:#fde68a;--co-fg:#92400e}
+.callout-tip{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-question{--co-bg:#ecfeff;--co-b:#a5f3fc;--co-fg:#155e75}
+.callout-observation{--co-bg:#f0fdfa;--co-b:#99f6e4;--co-fg:#115e59}
+.callout-complexity{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.callout-summary{--co-bg:#eef2ff;--co-b:#c7d2fe;--co-fg:#3730a3}
+.callout-advantage{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-disadvantage{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.callout-blue{--co-bg:#eff6ff;--co-b:#bfdbfe;--co-fg:#1e40af}
+.callout-green{--co-bg:#ecfdf5;--co-b:#a7f3d0;--co-fg:#065f46}
+.callout-red{--co-bg:#fef2f2;--co-b:#fecaca;--co-fg:#991b1b}
+.callout-yellow{--co-bg:#fffbeb;--co-b:#fde68a;--co-fg:#92400e}
+.callout-orange{--co-bg:#fff7ed;--co-b:#fed7aa;--co-fg:#9a3412}
+.callout-purple{--co-bg:#faf5ff;--co-b:#e9d5ff;--co-fg:#6b21a8}
+.callout-gray{--co-bg:#f8fafc;--co-b:#e2e8f0;--co-fg:#475569}
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#94a3b8}
+.token.punctuation{color:#cbd5e1}
+.token.property,.token.tag,.token.constant,.token.symbol,.token.deleted{color:#fca5a5}
+.token.boolean,.token.number{color:#fdba74}
+.token.selector,.token.attr-name,.token.string,.token.char,.token.builtin,.token.inserted{color:#86efac}
+.token.operator,.token.entity,.token.url,.token.variable{color:#7dd3fc}
+.token.atrule,.token.attr-value,.token.function,.token.class-name{color:#f0abfc}
+.token.keyword{color:#c4b5fd}
+.token.regex,.token.important{color:#fcd34d}
+@media (max-width:640px){body{padding:12px 8px}.doc{padding:20px 16px;border-radius:12px}h1{font-size:1.7rem}.title-row{align-items:flex-start}.badge{font-size:12px;padding:5px 10px}}
+@media print{body{background:#fff;padding:0}.doc{box-shadow:none;border:0;padding:0;max-width:none}}
+</style>
+</head>
+<body>
+<main class="page"><article class="doc"><h1>1. What is an Operating System?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>An Operating System is system software that acts as an interface between the user applications and the computer hardware. It manages hardware resources such as the CPU, memory, storage, and I/O devices, and provides services that applications need to run.</strong></p>
+<p>For example, when I run a Java application, I don&#39;t directly tell the CPU or memory how to execute it. The operating system manages those resources and provides the environment in which my application runs.</p>
+</blockquote>
+
+
+<h3>If interviewer asks: <strong>&quot;What are the main responsibilities of an OS?&quot;</strong></h3>
+
+
+<p>You can say:</p>
+
+
+<blockquote>
+<p><strong>The major responsibilities of an OS are process management, memory management, file and storage management, I/O device management, CPU scheduling, and security and resource management.</strong></p>
+</blockquote>
+
+
+<h3>🧠 Remember</h3>
+
+
+<p><strong>OS = Interface + Resource Manager</strong></p>
+
+
+<hr>
+
+
+<h1>2. What are the main functions of an Operating System?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>The main functions of an operating system are process management, memory management, file management, I/O management, CPU scheduling, and security.</strong></p>
+<p>In process management, the OS creates and manages processes and threads. In memory management, it allocates and deallocates memory and manages virtual memory. It also manages files and storage, controls I/O devices, schedules CPU time among processes and threads, and provides security and access control.</p>
+</blockquote>
+
+
+<h3>If interviewer asks: <strong>&quot;Can you explain each briefly?&quot;</strong></h3>
+
+
+<p>You can answer:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What OS does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Process Management</strong></td>
+<td>Creates, schedules, and terminates processes</td>
+</tr>
+<tr>
+<td><strong>Memory Management</strong></td>
+<td>Allocates memory and manages virtual memory</td>
+</tr>
+<tr>
+<td><strong>CPU Scheduling</strong></td>
+<td>Decides which runnable process/thread gets CPU time</td>
+</tr>
+<tr>
+<td><strong>File Management</strong></td>
+<td>Creates, reads, writes, and organizes files</td>
+</tr>
+<tr>
+<td><strong>I/O Management</strong></td>
+<td>Manages devices such as keyboard, disk, network</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Controls access to resources</td>
+</tr>
+<tr>
+<td><strong>Resource Management</strong></td>
+<td>Allocates hardware resources among programs</td>
+</tr>
+</tbody></table>
+
+
+<h3>🧠 Interview trick</h3>
+
+
+<p>Don&#39;t just list them. Give <strong>one line explaining each</strong>. That makes your answer sound like you understand the concept rather than memorized a list.</p>
+
+
+<hr>
+
+
+<h1>3. What is the difference between a Program and a Process?</h1>
+
+
+<p>This is <strong>very important</strong>. ⭐⭐⭐⭐⭐</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A program is a passive set of instructions stored on a storage device, whereas a process is a program that is currently being executed.</strong></p>
+<p>A program itself doesn&#39;t have an execution state, CPU state, or resources allocated to it. When we run a program, the operating system loads the required parts into memory, allocates resources, and creates a process to execute it.</p>
+<p>For example, a Java application stored as a <code>.class</code> or <code>.jar</code> file is a program. When I run that application, the OS creates a process for its execution.</p>
+</blockquote>
+
+
+<h3>Simple example</h3>
+
+
+<p>Think about a recipe:</p>
+
+
+<pre class="language-text"><code class="language-text">Recipe stored in a book
+        ↓
+      Program
+
+Someone actually cooking it
+        ↓
+      Process</code></pre>
+
+<h3>⭐ If interviewer asks: &quot;Can multiple processes come from one program?&quot;</h3>
+
+
+<p>Say:</p>
+
+
+<blockquote>
+<p><strong>Yes. The same program can be executed multiple times, and each execution can result in a separate process with its own execution state and resources.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>4. What is a Process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A process is a program in execution. It is an active entity that contains the program&#39;s instructions along with the execution state and resources required to execute them.</strong></p>
+<p>A process has information such as its process ID, program counter, CPU registers, memory information, and scheduling information. The operating system maintains this information using a data structure called the <strong>Process Control Block, or PCB</strong>.</p>
+</blockquote>
+
+
+<p>That&#39;s a strong fresher-level answer.</p>
+
+
+<h3>If interviewer asks:</h3>
+
+
+<p><strong>&quot;Is a process just a program loaded into memory?&quot;</strong></p>
+
+
+<p>Don&#39;t say simply yes.</p>
+
+
+<p>Say:</p>
+
+
+<blockquote>
+<p><strong>Not exactly. A process includes not only the program&#39;s instructions but also its current execution state, memory, CPU state, and other resources required for execution.</strong></p>
+</blockquote>
+
+
+<p>That&#39;s an important distinction.</p>
+
+
+<hr>
+
+
+<h1>5. What are the different states of a Process?</h1>
+
+
+<p>This is another <strong>must-know OS question</strong>. ⭐⭐⭐⭐⭐</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A process typically goes through several states during its lifetime: New, Ready, Running, Waiting or Blocked, and Terminated.</strong></p>
+<p>In the <strong>New</strong> state, the process is being created. In the <strong>Ready</strong> state, it is ready to execute but is waiting for CPU time. In the <strong>Running</strong> state, it is currently executing on the CPU. If it needs to wait for an I/O operation or some event, it moves to the <strong>Waiting or Blocked</strong> state. Once the event is completed, it moves back to Ready. Finally, when the process finishes execution, it enters the <strong>Terminated</strong> state.</p>
+</blockquote>
+
+
+<h3>🧠 Understand the flow</h3>
+
+
+<pre class="language-text"><code class="language-text">                 ┌─────────────┐
+                 │     New     │
+                 └──────┬──────┘
+                        ↓
+                 ┌─────────────┐
+          ┌──────│    Ready    │◄──────────┐
+          │      └──────┬──────┘           │
+          │             ↓                  │
+          │      ┌─────────────┐           │
+          │      │   Running   │           │
+          │      └───┬─────┬───┘           │
+          │          │     │               │
+          │          │     ↓               │
+          │          │  Terminated         │
+          │          │                     │
+          │          ↓                     │
+          │      ┌─────────────┐           │
+          └──────│   Waiting   │───────────┘
+                 │  / Blocked  │
+                 └─────────────┘</code></pre>
+
+<h3>The important transitions</h3>
+
+
+<p><strong>New → Ready</strong></p>
+
+
+<p>Process has been created and is ready to run.</p>
+
+
+<p><strong>Ready → Running</strong></p>
+
+
+<p>CPU scheduler selects it.</p>
+
+
+<p><strong>Running → Waiting</strong></p>
+
+
+<p>Process needs I/O or has to wait for an event.</p>
+
+
+<p><strong>Waiting → Ready</strong></p>
+
+
+<p>The required event/I/O completes.</p>
+
+
+<p><strong>Running → Ready</strong></p>
+
+
+<p>The OS preempts it, for example because its time slice expires.</p>
+
+
+<p><strong>Running → Terminated</strong></p>
+
+
+<p>Process finishes execution.</p>
+
+
+<hr>
+</article></main>
+</body>
+</html>
