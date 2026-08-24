@@ -580,6 +580,253 @@ Java continues</code></pre>
 </tr>
 </tbody></table>
 
+
+<hr>
+
+
+<h1>11. Why are threads called lightweight processes?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Threads are called lightweight processes because they require fewer resources to create and manage compared to processes. Threads within the same process share resources such as the address space, code, and open files, whereas separate processes generally have separate address spaces and more independent resources.</strong></p>
+<p>Therefore, thread creation and context switching are generally less expensive than process creation and context switching.</p>
+</blockquote>
+
+
+<h3>🧠 Simple way to remember</h3>
+
+
+<pre class="language-text"><code class="language-text">Process
+├── Own memory space
+├── Own resources
+└── Thread(s)
+
+Thread
+├── Shares process memory
+├── Own stack
+└── Own CPU state</code></pre>
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>Does lightweight mean threads don&#39;t have their own memory?</strong></p>
+
+
+<blockquote>
+<p><strong>No. Threads share the process&#39;s address space, but each thread still has its own stack, registers, program counter, and execution state.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>12. What resources are shared between threads of the same process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Threads within the same process share the process&#39;s address space and resources such as code, global variables, heap memory, and open files. However, each thread maintains its own execution-related information such as its stack, registers, and program counter.</strong></p>
+</blockquote>
+
+
+<p>Think:</p>
+
+
+<pre class="language-text"><code class="language-text">             PROCESS
+┌──────────────────────────────┐
+│                              │
+│   Code        ← Shared       │
+│   Heap        ← Shared       │
+│   Global data ← Shared       │
+│   Open files  ← Shared       │
+│                              │
+│   ┌──────┐ ┌──────┐ ┌──────┐│
+│   │ T1   │ │ T2   │ │ T3   ││
+│   │Stack │ │Stack │ │Stack ││
+│   └──────┘ └──────┘ └──────┘│
+│      Private   Private       │
+└──────────────────────────────┘</code></pre>
+
+<h3>⭐ Important distinction</h3>
+
+
+<p><strong>Shared:</strong></p>
+
+
+<ul>
+<li>Code</li>
+<li>Heap</li>
+<li>Global/static data</li>
+<li>Many process resources, such as open files</li>
+</ul>
+
+
+<p><strong>Private to each thread:</strong></p>
+
+
+<ul>
+<li>Stack</li>
+<li>Registers</li>
+<li>Program counter</li>
+<li>Thread-local storage</li>
+</ul>
+
+
+<hr>
+
+
+<h1>13. What resources are private to each thread?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Each thread has its own program counter, CPU registers, and stack. These are private because each thread can be executing a different function or instruction at the same time and therefore needs its own execution state.</strong></p>
+</blockquote>
+
+
+<p>For example:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1 → executing function A
+Thread 2 → executing function B</code></pre>
+
+<p>They can&#39;t use the same stack because their function calls and local variables are different.</p>
+
+
+<p>So:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1
+ ├── Program Counter
+ ├── Registers
+ └── Stack
+
+Thread 2
+ ├── Program Counter
+ ├── Registers
+ └── Stack</code></pre>
+
+<hr>
+
+
+<h1>14. What is Multithreading?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Multithreading is the ability of a process to execute multiple threads concurrently. Each thread can perform a different task while sharing the resources of the same process.</strong></p>
+<p>For example, a web server can use multiple threads to handle multiple client requests, allowing different requests to make progress without requiring a completely separate process for each request.</p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Imagine your backend:</p>
+
+
+<pre class="language-text"><code class="language-text">             Backend Process
+                   │
+       ┌───────────┼───────────┐
+       ↓           ↓           ↓
+    Thread 1    Thread 2    Thread 3
+     Login       Profile     Booking</code></pre>
+
+<p>The threads share the process&#39;s resources.</p>
+
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>What is the advantage of multithreading?</strong></p>
+
+
+<blockquote>
+<p><strong>It can improve responsiveness and resource utilization and allow multiple tasks to make progress concurrently. It can also take advantage of multiple CPU cores for parallel execution.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>15. What are the advantages and disadvantages of Multithreading?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>The main advantages of multithreading are improved responsiveness, better CPU utilization, the ability to perform multiple tasks concurrently, and efficient sharing of resources within a process.</strong></p>
+<p><strong>However, multithreading also introduces challenges such as race conditions, synchronization overhead, deadlocks, and the difficulty of debugging concurrent programs.</strong></p>
+</blockquote>
+
+
+<div class="callout callout-advantage"><div class="callout-title"><span class="callout-icon">✅</span><span>Advantages</span></div><div class="callout-body"><p><strong>1. Better responsiveness</strong></p>
+<p>One thread can continue while another waits for I/O.</p>
+<p><strong>2. Better CPU utilization</strong></p>
+<p>Multiple threads can keep CPU cores busy.</p>
+<p><strong>3. Resource sharing</strong></p>
+<p>Threads share the process&#39;s memory and resources.</p>
+<p><strong>4. Concurrency</strong></p>
+<p>Multiple tasks can make progress at the same time.</p>
+</div></div>
+
+<div class="callout callout-disadvantage"><div class="callout-title"><span class="callout-icon">❌</span><span>Disadvantages ⚠️</span></div><div class="callout-body"><p><strong>1. Race conditions</strong></p>
+<p>Multiple threads access shared data incorrectly.</p>
+<p><strong>2. Synchronization overhead</strong></p>
+<p>Locks and other synchronization mechanisms add overhead.</p>
+<p><strong>3. Deadlocks</strong></p>
+<p>Threads can become stuck waiting for each other.</p>
+<p><strong>4. Debugging difficulty</strong></p>
+<p>Concurrency bugs can be difficult to reproduce.</p>
+</div></div>
+
+<h1>🧠 Q11–Q15 in one picture</h1>
+
+
+<p>This is the mental model I want you to have:</p>
+
+
+<pre class="language-text"><code class="language-text">                 PROCESS
+                    │
+        ┌───────────┼───────────┐
+        ↓           ↓           ↓
+     Thread 1    Thread 2    Thread 3
+        │           │           │
+        └───────────┼───────────┘
+                    ↓
+          Shared Process Resources
+          ┌──────────────────────┐
+          │ Code                 │
+          │ Heap                 │
+          │ Global Data          │
+          │ Open Files           │
+          └──────────────────────┘
+
+Each Thread separately has:
+ ├── Stack
+ ├── Registers
+ └── Program Counter
+
+             ↓
+        Multithreading
+             ↓
+    Better concurrency
+             ↓
+       BUT ⚠️
+             ↓
+   Race Conditions
+   Synchronization
+   Deadlocks</code></pre>
 </article></main>
 </body>
 </html>
