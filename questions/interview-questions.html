@@ -78,7 +78,8 @@ tr:last-child td{border-bottom:0}
 
 <h3>🎤 Interview answer</h3>
 
-<div class="callout callout-blue" data-fence-callout="blue"><div class="callout-body"><p> <strong>An Operating System is system software that acts as an interface between the user applications and the computer hardware. It manages hardware resources such as the CPU, memory, storage, and I/O devices, and provides services that applications need to run.</strong></p>
+
+<div class="callout callout-blue" data-fence-callout="blue"><div class="callout-body"><p><strong>An Operating System is system software that acts as an interface between the user applications and the computer hardware. It manages hardware resources such as the CPU, memory, storage, and I/O devices, and provides services that applications need to run.</strong></p>
 <p>For example, when I run a Java application, I don&#39;t directly tell the CPU or memory how to execute it. The operating system manages those resources and provides the environment in which my application runs.</p>
 </div></div>
 
@@ -106,6 +107,7 @@ tr:last-child td{border-bottom:0}
 
 
 <h3>🎤 Interview answer</h3>
+
 
 <div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p><strong>The main functions of an operating system are process management, memory management, file management, I/O management, CPU scheduling, and security.</strong></p>
 <p>In process management, the OS creates and manages processes and threads. In memory management, it allocates and deallocates memory and manages virtual memory. It also manages files and storage, controls I/O devices, schedules CPU time among processes and threads, and provides security and access control.</p>
@@ -818,6 +820,411 @@ Each Thread separately has:
              ↓
    Race Conditions
    Synchronization
-   Deadlocks</code></pre></article></main>
+   Deadlocks</code></pre>
+
+<hr>
+
+
+<h1>16. What happens when a process creates a child process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-blue" data-fence-callout="blue"><div class="callout-body"><p>When a process creates another process, the original process is called the parent process and the newly created process is called the child process. The operating system assigns the child process its own process ID and creates the necessary process management information for it.</p>
+<p>The child may inherit or share certain resources from the parent depending on the operating system and how the process is created, but the child is a separate process with its own execution state.</p>
+</div></div>
+
+<h3>Simple picture</h3>
+
+
+<pre class="language-text"><code class="language-text">        Parent Process
+              │
+        creates child
+              ↓
+        Child Process</code></pre>
+
+<p>For example, in Unix-like systems, a process can create another process using <code>fork()</code>.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Before fork():
+
+      Parent
+
+After fork():
+
+      Parent
+        │
+        └────── Child</code></pre>
+
+<p>Both can then execute independently.</p>
+
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>Does the child have the same PID as the parent?</strong></p>
+
+
+<blockquote>
+<p><strong>No. The child receives a different PID. The parent and child are separate processes.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>17. What is a Parent Process and Child Process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>A parent process is a process that creates another process, while the newly created process is called the child process. The operating system maintains a relationship between them so that the parent can manage or wait for its child.</p>
+<p>The child has its own process ID and execution state, although it may inherit certain attributes or resources from the parent depending on the operating system.</p>
+</div></div>
+
+<h3>Example</h3>
+
+
+<pre class="language-text"><code class="language-text">             OS
+              │
+        Parent Process
+              │
+       ┌──────┴──────┐
+       ↓             ↓
+    Child A       Child B</code></pre>
+
+<p>A parent can have multiple children.</p>
+
+
+<hr>
+
+
+<h1>18. What is a Zombie Process? ☠️</h1>
+
+
+<p>This is a very common interview question.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-yellow" data-fence-callout="yellow"><div class="callout-body"><p>A zombie process is a process that has finished execution, but its entry in the process table still exists because its parent has not yet collected its termination status.</p>
+<p>The process itself is no longer executing, but the OS keeps a small amount of information about it, such as its PID and exit status, so that the parent can retrieve that information.</p>
+</div></div>
+
+<h3>Understand the flow</h3>
+
+
+<pre class="language-text"><code class="language-text">Parent
+  │
+  └── creates Child
+          │
+          ↓
+       Running
+          │
+          ↓
+       Finishes
+          │
+          ↓
+       Zombie
+          │
+          ↓
+ Parent collects exit status
+          │
+          ↓
+       Removed</code></pre>
+
+<p>The parent typically does this through a mechanism such as <code>wait()</code>/<code>waitpid()</code> on Unix-like systems.</p>
+
+
+<h3>🧠 Important</h3>
+
+
+<p>A zombie is <strong>not running</strong>.</p>
+
+
+<p>It is essentially:</p>
+
+
+<blockquote>
+<p><strong>Finished process + remaining process-table entry</strong></p>
+</blockquote>
+
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>Why does a zombie exist?</strong></p>
+
+
+<blockquote>
+<p><strong>Because the OS needs to retain the child&#39;s termination status until the parent retrieves it.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>19. What is an Orphan Process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p>An orphan process is a process whose parent has terminated while the child is still running. The operating system then reassigns or adopts the orphan under another system process so that it can continue to be managed properly.</p>
+</div></div>
+<h3>Example</h3>
+
+
+<pre class="language-text"><code class="language-text">Parent
+  │
+  └── Child
+        │
+        │ Parent terminates
+        ↓
+      Orphan
+        │
+        ↓
+ Adopted by another system process</code></pre>
+
+<h3>⭐ Zombie vs Orphan</h3>
+
+
+<p>This is an excellent interview follow-up.</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Zombie</th>
+<th>Orphan</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Child has <strong>finished</strong></td>
+<td>Child is <strong>still running</strong></td>
+</tr>
+<tr>
+<td>Parent hasn&#39;t collected exit status</td>
+<td>Parent has terminated</td>
+</tr>
+<tr>
+<td>Process is no longer executing</td>
+<td>Process continues executing</td>
+</tr>
+<tr>
+<td>Waiting to be reaped</td>
+<td>Gets adopted/re-parented</td>
+</tr>
+</tbody></table>
+
+
+<h3>🧠 Easy memory trick</h3>
+
+
+<p><strong>Zombie → Child died, parent hasn&#39;t collected it.</strong></p>
+
+
+<p><strong>Orphan → Parent died, child is still alive.</strong></p>
+
+
+<hr>
+
+
+<h1>20. What is the difference between Concurrency and Parallelism? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is <strong>very important</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>Concurrency means multiple tasks are making progress during overlapping periods, while parallelism means multiple tasks are actually executing at the same time, typically on different CPU cores.</p>
+<p>Concurrency can happen even on a single CPU core through techniques such as context switching. Parallelism generally requires multiple execution units, such as multiple CPU cores, to execute tasks simultaneously.</p>
+</div></div>
+
+<h3>🔥 Example: Single Core</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Task A
+Task B
+Task C</code></pre>
+
+<p>One CPU core:</p>
+
+
+<pre class="language-text"><code class="language-text">CPU Core
+
+A → B → A → C → B → A → ...</code></pre>
+
+<p>Only one task is executing at any instant.</p>
+
+
+<p>But all three tasks are <strong>making progress over time</strong>.</p>
+
+
+<p>That&#39;s:</p>
+
+
+<blockquote>
+<p><strong>Concurrency</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h3>🔥 Example: Multiple Cores</h3>
+
+
+<p>Suppose you have 3 CPU cores:</p>
+
+
+<pre class="language-text"><code class="language-text">Core 1 → Task A
+Core 2 → Task B
+Core 3 → Task C</code></pre>
+
+<p>A, B and C can actually execute simultaneously.</p>
+
+
+<p>That&#39;s:</p>
+
+
+<blockquote>
+<p><strong>Parallelism</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>🧠 The easiest way to remember</h1>
+
+
+<h3>Concurrency</h3>
+
+
+<blockquote>
+<p><strong>&quot;Dealing with multiple tasks.&quot;</strong></p>
+</blockquote>
+
+
+<h3>Parallelism</h3>
+
+
+<blockquote>
+<p><strong>&quot;Doing multiple tasks at the same time.&quot;</strong></p>
+</blockquote>
+
+
+<p>A common analogy:</p>
+
+
+<h3>🍳 One chef</h3>
+
+
+<p>The chef:</p>
+
+
+<pre class="language-text"><code class="language-text">Cook eggs
+ ↓
+Start toast
+ ↓
+Check eggs
+ ↓
+Make coffee
+ ↓
+Check toast</code></pre>
+
+<p>One person is managing multiple tasks.</p>
+
+
+<p><strong>Concurrency.</strong></p>
+
+
+<h3>👨‍🍳👨‍🍳 Multiple chefs</h3>
+
+
+<pre class="language-text"><code class="language-text">Chef 1 → Eggs
+Chef 2 → Toast
+Chef 3 → Coffee</code></pre>
+
+<p>Tasks happen simultaneously.</p>
+
+
+<p><strong>Parallelism.</strong></p>
+
+
+<hr>
+
+
+<h1>🔥 Q16–Q20 Summary</h1>
+
+
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Core idea</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>16. Child creation</strong></td>
+<td>Parent creates a separate child process</td>
+</tr>
+<tr>
+<td><strong>17. Parent vs Child</strong></td>
+<td>Creator vs created process</td>
+</tr>
+<tr>
+<td><strong>18. Zombie</strong></td>
+<td>Child finished, parent hasn&#39;t collected status</td>
+</tr>
+<tr>
+<td><strong>19. Orphan</strong></td>
+<td>Parent finished, child still running</td>
+</tr>
+<tr>
+<td><strong>20. Concurrency vs Parallelism</strong></td>
+<td>Overlapping progress vs actual simultaneous execution</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h2>🎯 We&#39;ve now completed Q1–Q20</h2>
+
+
+<p>You&#39;ve covered the entire <strong>Processes &amp; Threads</strong> foundation:</p>
+
+
+<pre class="language-text"><code class="language-text">OS
+ ↓
+Process
+ ├── PCB
+ ├── PID
+ ├── States
+ └── Context Switching
+       ↓
+     Thread
+       ↓
+  Multithreading
+       ↓
+Concurrency / Parallelism
+       ↓
+Parent / Child
+       ↓
+Zombie / Orphan</code></pre></article></main>
 </body>
 </html>
