@@ -978,6 +978,7 @@ After fork():
 
 <div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p>An orphan process is a process whose parent has terminated while the child is still running. The operating system then reassigns or adopts the orphan under another system process so that it can continue to be managed properly.</p>
 </div></div>
+
 <h3>Example</h3>
 
 
@@ -1225,6 +1226,475 @@ Concurrency / Parallelism
        ↓
 Parent / Child
        ↓
-Zombie / Orphan</code></pre></article></main>
+Zombie / Orphan</code></pre>
+
+<p>Yep. 😎 We&#39;ve finished <strong>Q1–Q20</strong>, so now we move to <strong>Q21–Q25: CPU Scheduling</strong>.</p>
+
+
+<p>This section answers a fundamental OS question:</p>
+
+
+<blockquote>
+<p><strong>&quot;If multiple processes want the CPU, who gets it, and for how long?&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>21. What is CPU Scheduling?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>CPU scheduling is the process of selecting a process or thread from the ready queue and allocating the CPU to it. Since multiple processes may be ready to execute at the same time, the operating system uses scheduling algorithms to decide which one should run next.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue:
+
+P1
+P2
+P3
+P4</code></pre>
+
+<p>But you have only one CPU core.</p>
+
+
+<p>The OS needs to decide:</p>
+
+
+<pre class="language-text"><code class="language-text">Who gets the CPU first?
+        ↓
+      P2</code></pre>
+
+<p>Then after P2:</p>
+
+
+<pre class="language-text"><code class="language-text">P2 → P4 → P1 → P3</code></pre>
+
+<p>The <strong>scheduler</strong> makes these decisions.</p>
+
+
+<h3>🎯 Why do we need CPU scheduling?</h3>
+
+
+<p>Because we want to:</p>
+
+
+<ul>
+<li>Keep the CPU busy</li>
+<li>Improve response time</li>
+<li>Reduce waiting time</li>
+<li>Improve throughput</li>
+<li>Provide fairness</li>
+</ul>
+
+
+<hr>
+
+
+<h1>22. What is a Scheduler?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A scheduler is an operating-system component that decides which process or thread should be selected for execution from the available processes. The short-term scheduler, also called the CPU scheduler, selects a ready process or thread and gives it the CPU.</strong></p>
+</blockquote>
+
+
+<p>Think:</p>
+
+
+<pre class="language-text"><code class="language-text">           Ready Queue
+        ┌───┬───┬───┬───┐
+        │ P1│ P2│ P3│ P4│
+        └───┴───┴───┴───┘
+                 │
+                 ↓
+             Scheduler
+                 │
+                 ↓
+                CPU</code></pre>
+
+<h3>🔥 Scheduler vs Scheduling</h3>
+
+
+<p>Don&#39;t confuse these:</p>
+
+
+<p><strong>Scheduler</strong> → the component making the decision.</p>
+
+
+<p><strong>Scheduling</strong> → the process of deciding who gets the CPU.</p>
+
+
+<hr>
+
+
+<h1>23. What are the different types of schedulers?</h1>
+
+
+<p>There are traditionally <strong>three types</strong> you should know.</p>
+
+
+<h3>1. Long-Term Scheduler</h3>
+
+
+<p>Also called the <strong>job scheduler</strong>.</p>
+
+
+<p>It decides:</p>
+
+
+<blockquote>
+<p><strong>Which jobs/processes should be admitted into the system for execution?</strong></p>
+</blockquote>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Jobs on disk
+     ↓
+Long-term scheduler
+     ↓
+Processes in memory</code></pre>
+
+<p>It controls the <strong>degree of multiprogramming</strong> — roughly, how many processes are admitted to the system.</p>
+
+
+<hr>
+
+
+<h3>2. Short-Term Scheduler ⭐⭐⭐⭐⭐</h3>
+
+
+<p>Also called the <strong>CPU scheduler</strong>.</p>
+
+
+<p>It decides:</p>
+
+
+<blockquote>
+<p><strong>Which ready process/thread should get the CPU next?</strong></p>
+</blockquote>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue
+    ↓
+Short-term scheduler
+    ↓
+CPU</code></pre>
+
+<p>This scheduler runs <strong>very frequently</strong>, so it needs to be fast.</p>
+
+
+<hr>
+
+
+<h3>3. Medium-Term Scheduler</h3>
+
+
+<p>It can temporarily remove processes from memory and later bring them back.</p>
+
+
+<p>This is associated with <strong>swapping</strong>.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Memory
+  ↓
+Medium-term scheduler
+  ↓
+Temporarily remove process
+  ↓
+Disk</code></pre>
+
+<p>Later:</p>
+
+
+<pre class="language-text"><code class="language-text">Disk
+ ↓
+Memory</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>&quot;Traditionally, operating systems describe three types of schedulers: the long-term scheduler, which controls which jobs are admitted; the short-term scheduler, which selects the next ready process or thread for the CPU; and the medium-term scheduler, which can temporarily suspend or swap processes to manage memory and the degree of multiprogramming.&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>24. What is Preemptive vs Non-Preemptive Scheduling? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is <strong>very important</strong>.</p>
+
+
+<p>The question is basically:</p>
+
+
+<blockquote>
+<p><strong>Can the OS take the CPU away from a running process?</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h2>🟢 Non-Preemptive Scheduling</h2>
+
+
+<p>Once a process gets the CPU:</p>
+
+
+<blockquote>
+<p><strong>It keeps the CPU until it finishes or voluntarily blocks/waits.</strong></p>
+</blockquote>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 gets CPU
+      ↓
+P1 keeps CPU
+      ↓
+P1 finishes
+      ↓
+P2 gets CPU</code></pre>
+
+<p>The OS doesn&#39;t forcibly interrupt P1 just because another process has become ready.</p>
+
+
+<p>Examples:</p>
+
+
+<ul>
+<li>FCFS</li>
+<li>Traditional non-preemptive SJF</li>
+</ul>
+
+
+<hr>
+
+
+<h2>🔴 Preemptive Scheduling</h2>
+
+
+<p>The OS <strong>can interrupt a running process</strong> and give the CPU to another process.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 running
+   ↓
+Timer interrupt
+   ↓
+OS scheduler
+   ↓
+P1 paused
+   ↓
+P2 gets CPU</code></pre>
+
+<p>This is how systems can provide responsive multitasking.</p>
+
+
+<p>Examples:</p>
+
+
+<ul>
+<li>Round Robin</li>
+<li>SRTF</li>
+<li>Preemptive Priority Scheduling</li>
+</ul>
+
+
+<hr>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>&quot;In preemptive scheduling, the operating system can interrupt a running process and allocate the CPU to another process. In non-preemptive scheduling, once a process gets the CPU, it generally keeps it until it finishes or blocks voluntarily. Preemptive scheduling generally provides better responsiveness, but it introduces additional context-switching overhead.&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>25. What is FCFS Scheduling?</h1>
+
+
+<p><strong>FCFS = First Come, First Served</strong></p>
+
+
+<p>It&#39;s one of the simplest CPU scheduling algorithms.</p>
+
+
+<p>The rule is:</p>
+
+
+<blockquote>
+<p><strong>The process that arrives first gets the CPU first.</strong></p>
+</blockquote>
+
+
+<p>Just like standing in a queue.</p>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue:
+
+P1 → P2 → P3 → P4
+
+CPU:
+
+P1 → P2 → P3 → P4</code></pre>
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th align="right">Arrival Time</th>
+<th align="right">Burst Time</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td align="right">0</td>
+<td align="right">5</td>
+</tr>
+<tr>
+<td>P2</td>
+<td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>P3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+</tbody></table>
+
+
+<p>FCFS gives:</p>
+
+
+<pre class="language-text"><code class="language-text">0        5        8       10
+|--------|--------|--------|
+   P1       P2       P3</code></pre>
+
+<p>P1 arrives first → runs first.</p>
+
+
+<p>Then P2.</p>
+
+
+<p>Then P3.</p>
+
+
+<hr>
+
+
+<h2>🔥 The major problem with FCFS</h2>
+
+
+<p>Imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 = 20 seconds
+P2 = 2 seconds
+P3 = 2 seconds</code></pre>
+
+<p>And they arrive in that order.</p>
+
+
+<p>FCFS:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 ────────────────────
+                       P2 ──
+                            P3 ──</code></pre>
+
+<p>P2 and P3 are tiny jobs, but they have to wait for the huge P1.</p>
+
+
+<p>This is called the:</p>
+
+
+<h1><strong>Convoy Effect</strong></h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>&quot;FCFS is a non-preemptive scheduling algorithm where processes are executed in their order of arrival. It is simple and fair in terms of arrival order, but it can cause high waiting time and the convoy effect, where short processes are forced to wait behind a long-running process.&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>🧠 Today&#39;s 5 concepts together</h1>
+
+
+<pre class="language-text"><code class="language-text">              CPU Scheduling
+                    │
+                    ↓
+             Ready Queue
+                    │
+                    ↓
+               Scheduler
+                    │
+                    ↓
+             Select process
+                    │
+          ┌─────────┴─────────┐
+          ↓                   ↓
+    Non-Preemptive       Preemptive
+          │                   │
+          ↓                   ↓
+    Keeps CPU          Can interrupt
+          │                   │
+          ↓                   ↓
+        FCFS              Round Robin
+                           SRTF</code></pre>
+
+<p>And remember:</p>
+
+
+<blockquote>
+<p><strong>Scheduler = who decides</strong>
+<strong>Scheduling = decision process</strong>
+<strong>Preemptive = OS can take CPU away</strong>
+<strong>Non-preemptive = process keeps CPU until it finishes/blocks</strong>
+<strong>FCFS = first arrival runs first</strong></p>
+</blockquote>
+</article></main>
 </body>
 </html>
