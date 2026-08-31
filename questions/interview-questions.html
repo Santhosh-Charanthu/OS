@@ -1689,12 +1689,464 @@ P3 = 2 seconds</code></pre>
 
 
 <blockquote>
-<p><strong>Scheduler = who decides</strong>
-<strong>Scheduling = decision process</strong>
-<strong>Preemptive = OS can take CPU away</strong>
-<strong>Non-preemptive = process keeps CPU until it finishes/blocks</strong>
-<strong>FCFS = first arrival runs first</strong></p>
+<p><strong>Scheduler = who decides</strong> <strong>Scheduling = decision process</strong> <strong>Preemptive = OS can take CPU away</strong> <strong>Non-preemptive = process keeps CPU until it finishes/blocks</strong> <strong>FCFS = first arrival runs first</strong></p>
 </blockquote>
+
+
+<hr>
+
+
+<h1>26. What is SJF Scheduling?</h1>
+
+
+<p><strong>SJF = Shortest Job First</strong></p>
+
+
+<p>The idea is simple:</p>
+
+
+<blockquote>
+<p><strong>Among the available processes, the process with the shortest CPU burst time is selected first.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th align="right">Burst Time</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td align="right">8 ms</td>
+</tr>
+<tr>
+<td>P2</td>
+<td align="right">3 ms</td>
+</tr>
+<tr>
+<td>P3</td>
+<td align="right">5 ms</td>
+</tr>
+<tr>
+<td>P4</td>
+<td align="right">2 ms</td>
+</tr>
+</tbody></table>
+
+
+<p>SJF chooses:</p>
+
+
+<pre class="language-text"><code class="language-text">P4 → P2 → P3 → P1
+ 2     3     5     8</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>SJF, or Shortest Job First, is a CPU scheduling algorithm that selects the process with the shortest expected CPU burst time among the available processes. It can minimize average waiting time when burst times are known or estimated, but accurately knowing the future CPU burst time can be difficult.</strong></p>
+</blockquote>
+
+
+<div class="callout callout-important"><div class="callout-title"><span class="callout-icon">⭐</span><span>Important point ⚠️</span></div><div class="callout-body"><p>Traditional SJF is <strong>non-preemptive</strong>.</p>
+<p>Once a process starts:</p>
+<pre class="language-text"><code class="language-text">P1 running
+   ↓
+P1 continues
+   ↓
+P1 finishes
+   ↓
+Next process</code></pre></div></div>
+
+<h1>27. What is SRTF Scheduling?</h1>
+
+
+<p><strong>SRTF = Shortest Remaining Time First</strong></p>
+
+
+<p>Think of it as:</p>
+
+
+<blockquote>
+<p><strong>Preemptive version of SJF.</strong></p>
+</blockquote>
+
+
+<p>Instead of asking:</p>
+
+
+<blockquote>
+<p>&quot;Which process has the shortest total burst time?&quot;</p>
+</blockquote>
+
+
+<p>we ask:</p>
+
+
+<blockquote>
+<p><strong>&quot;Which available process has the shortest remaining execution time?&quot;</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 arrives at time 0
+Burst = 8</code></pre>
+
+<p>So:</p>
+
+
+<pre class="language-text"><code class="language-text">Time 0 → P1 starts</code></pre>
+
+<p>At time 2:</p>
+
+
+<pre class="language-text"><code class="language-text">P2 arrives
+Burst = 3</code></pre>
+
+<p>P1 has:</p>
+
+
+<pre class="language-text"><code class="language-text">8 - 2 = 6 ms remaining</code></pre>
+
+<p>P2 needs:</p>
+
+
+<pre class="language-text"><code class="language-text">3 ms</code></pre>
+
+<p>So SRTF says:</p>
+
+
+<blockquote>
+<p>&quot;P2 needs less time. I&#39;ll pause P1.&quot;</p>
+</blockquote>
+
+
+<pre class="language-text"><code class="language-text">P1 running
+   ↓
+P2 arrives
+   ↓
+P1 paused
+   ↓
+P2 runs
+   ↓
+P2 finishes
+   ↓
+P1 resumes</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>SRTF, or Shortest Remaining Time First, is the preemptive version of SJF. The scheduler always selects the available process with the shortest remaining CPU burst time. If a new process arrives with a shorter remaining time than the currently running process, the current process can be preempted.</strong></p>
+</blockquote>
+
+
+<h3>🧠 Remember</h3>
+
+
+<pre class="language-text"><code class="language-text">SJF  → Shortest Job → Non-preemptive
+SRTF → Shortest Remaining Time → Preemptive</code></pre>
+
+<hr>
+
+
+<h1>28. What is Round Robin Scheduling? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is <strong>very commonly asked</strong>.</p>
+
+
+<p>Round Robin is designed particularly for <strong>time-sharing systems</strong>.</p>
+
+
+<p>The key concept is:</p>
+
+
+<blockquote>
+<p><strong>Each process gets a fixed amount of CPU time called a time quantum/time slice.</strong></p>
+</blockquote>
+
+
+<p>Imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue:
+
+P1 → P2 → P3</code></pre>
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Time quantum = 2 ms</code></pre>
+
+<p>Then:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → 2 ms
+P2 → 2 ms
+P3 → 2 ms
+P1 → 2 ms
+P2 → 2 ms
+P3 → 2 ms
+...</code></pre>
+
+<p>It&#39;s like everyone gets a turn.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Round Robin is a preemptive CPU scheduling algorithm where each ready process is given a fixed time quantum. When its time quantum expires, the process is preempted and moved to the back of the ready queue if it still has work to do. This provides fairness and good responsiveness for interactive systems.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h2>🔥 What happens if the time quantum is too small?</h2>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Time quantum = 1 ms</code></pre>
+
+<p>Then:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → P2 → P3 → P1 → P2 → P3 → ...</code></pre>
+
+<p>There will be lots of context switches.</p>
+
+
+<p>That creates <strong>context-switching overhead</strong>.</p>
+
+
+<h3>What if the time quantum is too large?</h3>
+
+
+<p>Round Robin starts behaving more like <strong>FCFS</strong> because processes may run for long periods before another process gets a turn.</p>
+
+
+<p>So there is a trade-off.</p>
+
+
+<hr>
+
+
+<h1>29. What is Priority Scheduling?</h1>
+
+
+<p>Here the scheduler gives preference based on <strong>priority</strong>.</p>
+
+
+<p>For example:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → Priority 3
+P2 → Priority 1
+P3 → Priority 2</code></pre>
+
+<p>Assuming <strong>smaller number means higher priority</strong>:</p>
+
+
+<pre class="language-text"><code class="language-text">P2 → P3 → P1</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Priority scheduling is a scheduling algorithm where each process is assigned a priority, and the scheduler selects a process based on that priority. It can be implemented as either preemptive or non-preemptive scheduling. A problem with priority scheduling is that low-priority processes may wait indefinitely if higher-priority processes keep arriving.</strong></p>
+</blockquote>
+
+
+<p>That problem is called:</p>
+
+
+<h1><strong>Starvation</strong></h1>
+
+
+<hr>
+
+
+<h1>30. What is Starvation and how can it be prevented?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Starvation occurs when a process waits for a very long time, potentially indefinitely, because other processes keep getting preference for the required resource, such as CPU time.</strong></p>
+<p><strong>One common way to prevent starvation is aging, where the priority of a waiting process is gradually increased over time so that it eventually gets a chance to execute.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → Low priority</code></pre>
+
+<p>But new high-priority processes keep arriving:</p>
+
+
+<pre class="language-text"><code class="language-text">High → High → High → High → High → ...</code></pre>
+
+<p>P1 keeps waiting:</p>
+
+
+<pre class="language-text"><code class="language-text">P1
+ ↓
+waiting...
+ ↓
+waiting...
+ ↓
+waiting...</code></pre>
+
+<p>😢</p>
+
+
+<p>That&#39;s starvation.</p>
+
+
+<h3>Aging</h3>
+
+
+<p>We gradually increase P1&#39;s priority:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 priority = 10
+       ↓
+waits
+       ↓
+priority = 8
+       ↓
+waits
+       ↓
+priority = 5
+       ↓
+waits
+       ↓
+priority = 1
+       ↓
+P1 gets CPU</code></pre>
+
+<p>The exact priority direction depends on the scheduling convention, but the idea is:</p>
+
+
+<blockquote>
+<p><strong>The longer a process waits, the more its priority is boosted.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>🧠 Q26–Q30 Cheat Sheet</h1>
+
+
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Main idea</th>
+<th>Preemptive?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SJF</strong></td>
+<td>Shortest job first</td>
+<td>❌ Usually no</td>
+</tr>
+<tr>
+<td><strong>SRTF</strong></td>
+<td>Shortest remaining time first</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td><strong>Round Robin</strong></td>
+<td>Each process gets a time quantum</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td>Highest-priority process first</td>
+<td>Either</td>
+</tr>
+<tr>
+<td><strong>Starvation</strong></td>
+<td>Process waits indefinitely due to repeated preference for others</td>
+<td>Problem</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h2>🎯 One thing to be very clear about</h2>
+
+
+<p>Don&#39;t confuse <strong>starvation</strong> with <strong>deadlock</strong>.</p>
+
+
+<h3>Starvation</h3>
+
+
+<blockquote>
+<p>A process <strong>can potentially run</strong>, but keeps getting denied because other processes are preferred.</p>
+</blockquote>
+
+
+<h3>Deadlock</h3>
+
+
+<blockquote>
+<p>Processes are <strong>stuck waiting for each other/resources</strong>, so none of them can proceed.</p>
+</blockquote>
+
+
+<p>We&#39;ll tackle deadlock properly later.</p>
+
+
+<hr>
+
+
+<h3>🧪 Quick interview test</h3>
+
+
+<p>Try these without looking back:</p>
+
+
+<p><strong>1. SJF vs SRTF — what&#39;s the difference?</strong></p>
+
+
+<p><strong>2. Why does Round Robin need a time quantum?</strong></p>
+
+
+<p><strong>3. What happens if Round Robin&#39;s time quantum is extremely small?</strong></p>
+
+
+<p><strong>4. What is starvation?</strong></p>
+
+
+<p><strong>5. How does aging solve starvation?</strong></p>
 </article></main>
 </body>
 </html>
