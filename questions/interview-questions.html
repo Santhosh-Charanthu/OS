@@ -1765,7 +1765,6 @@ P1 continues
 P1 finishes
    ↓
 Next process</code></pre></div></div>
-
 <h1>27. What is SRTF Scheduling?</h1>
 
 
@@ -2147,6 +2146,398 @@ P1 gets CPU</code></pre>
 
 
 <p><strong>5. How does aging solve starvation?</strong></p>
+
+
+<p>Absolutely. 🔥 Now we&#39;re entering one of the <strong>highest-value OS topics for SDE interviews: Synchronization</strong>.</p>
+
+
+<p>We&#39;ll cover <strong>Q31–Q35</strong>:</p>
+
+
+<ol>
+<li>Race Condition</li>
+<li>Critical Section</li>
+<li>Process/Thread Synchronization</li>
+<li>Mutex</li>
+<li>Semaphore</li>
+</ol>
+
+
+<p>The key is to understand how these five concepts connect.</p>
+
+
+<hr>
+
+
+<h1>31. What is a Race Condition? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>A race condition occurs when <strong>multiple threads/processes access shared data concurrently, and the final result depends on the order/timing of their execution</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A race condition occurs when multiple threads access and modify shared data concurrently, and the final result depends on the timing or order in which the threads execute. This can lead to incorrect or unpredictable results.</strong></p>
+<p><strong>It can be prevented by properly synchronizing access to the shared resource.</strong></p>
+</blockquote>
+
+
+<h3>Let&#39;s understand it with Java</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-java"><code class="language-java"><span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span></code></pre>
+
+<p>Two threads execute:</p>
+
+
+<pre class="language-java"><code class="language-java">count<span class="token operator">++</span><span class="token punctuation">;</span></code></pre>
+
+<p>You might think:</p>
+
+
+<pre class="language-text"><code class="language-text">0 → 1 → 2</code></pre>
+
+<p>So the answer should be <code>2</code>.</p>
+
+
+<p>But <code>count++</code> is <strong>not one indivisible operation</strong>.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Read count
+   ↓
+Add 1
+   ↓
+Write count</code></pre>
+
+<p>Now imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">Initial count = 0
+
+Thread 1: Read 0
+Thread 2: Read 0
+
+Thread 1: Add 1 → 1
+Thread 2: Add 1 → 1
+
+Thread 1: Write 1
+Thread 2: Write 1</code></pre>
+
+<p>Final result:</p>
+
+
+<pre class="language-text"><code class="language-text">count = 1 ❌</code></pre>
+
+<p>Even though two increments happened.</p>
+
+
+<p>That&#39;s a <strong>race condition</strong>.</p>
+
+
+<h3>🧠 Remember</h3>
+
+
+<blockquote>
+<p><strong>Race condition = result depends on who gets there first.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>32. What is a Critical Section? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>A <strong>critical section</strong> is the part of a program where shared data/resource is accessed or modified and therefore needs controlled access.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A critical section is a section of code that accesses shared resources and must be executed in a controlled manner so that multiple threads do not simultaneously perform conflicting operations on the shared resource.</strong></p>
+</blockquote>
+
+
+<p>Example:</p>
+
+
+<pre class="language-java"><code class="language-java">balance <span class="token operator">=</span> balance <span class="token operator">-</span> <span class="token number">500</span><span class="token punctuation">;</span></code></pre>
+
+<p>If multiple threads can modify <code>balance</code>, this operation may need to be protected.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1
+   ↓
+┌──────────────────┐
+│ Critical Section │
+│                  │
+│ modify balance   │
+│                  │
+└──────────────────┘</code></pre>
+
+<p>The goal is generally:</p>
+
+
+<blockquote>
+<p><strong>Only one thread at a time should execute the conflicting critical section.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h2>🔥 Critical Section vs Race Condition</h2>
+
+
+<p>Don&#39;t confuse them.</p>
+
+
+<p><strong>Critical section</strong> = the <strong>code region</strong> accessing shared data.</p>
+
+
+<p><strong>Race condition</strong> = the <strong>problem</strong> that can happen when concurrent access isn&#39;t properly controlled.</p>
+
+
+<pre class="language-text"><code class="language-text">Shared resource
+      ↓
+Critical Section
+      ↓
+Improper concurrent access
+      ↓
+Race Condition ❌</code></pre>
+
+<hr>
+
+
+<h1>33. What is Process/Thread Synchronization?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Synchronization is the coordination of multiple processes or threads when they access shared resources, so that their operations occur safely and consistently without causing race conditions or data corruption.</strong></p>
+<p><strong>Operating systems and programming languages provide mechanisms such as mutexes, semaphores, monitors, and locks to achieve synchronization.</strong></p>
+</blockquote>
+
+
+<h3>Why do we need it?</h3>
+
+
+<p>Imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">Bank balance = ₹1000
+
+Thread A → withdraw ₹700
+Thread B → withdraw ₹500</code></pre>
+
+<p>Both threads access the same balance.</p>
+
+
+<p>Without synchronization:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread A ──┐
+           ├──→ Shared Balance
+Thread B ──┘</code></pre>
+
+<p>They can interfere with each other.</p>
+
+
+<p>With synchronization:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread A
+   ↓
+[LOCK]
+   ↓
+Modify balance
+   ↓
+[UNLOCK]
+   ↓
+Thread B</code></pre>
+
+<hr>
+
+
+<h1>34. What is a Mutex? 🔒 ⭐⭐⭐⭐⭐</h1>
+
+
+<p><strong>Mutex = Mutual Exclusion</strong></p>
+
+
+<p>The easiest way to understand a mutex:</p>
+
+
+<blockquote>
+<p><strong>A mutex is a lock that allows only one thread at a time to enter a protected critical section.</strong></p>
+</blockquote>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A mutex, or mutual exclusion lock, is a synchronization mechanism used to protect shared resources. At most one thread can hold the mutex at a time. A thread must acquire the mutex before entering the protected critical section and release it after finishing.</strong></p>
+</blockquote>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">             Mutex
+               🔒
+                │
+        ┌───────┴───────┐
+        ↓               ↓
+    Thread A          Thread B
+        │               │
+     acquire         waiting
+        │
+        ↓
+ Critical Section
+        │
+      release
+        │
+        ↓
+                    Thread B
+                    acquire</code></pre>
+
+<p>So:</p>
+
+
+<blockquote>
+<p><strong>Thread A has the lock → Thread B waits.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>35. What is a Semaphore? 🚦 ⭐⭐⭐⭐⭐</h1>
+
+
+<p>A semaphore is another synchronization mechanism, but its model is different from a mutex.</p>
+
+
+<p>Think of a semaphore as a <strong>counter representing available permits/resources</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A semaphore is a synchronization mechanism that uses a counter to control access to shared resources. A thread performs a wait or acquire operation to obtain a permit and a signal or release operation to return it. A counting semaphore can allow multiple threads to access a limited number of identical resources simultaneously.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose a server has <strong>3 database connections</strong> available.</p>
+
+
+<pre class="language-text"><code class="language-text">Semaphore = 3</code></pre>
+
+<p>Then:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1 → gets connection
+Thread 2 → gets connection
+Thread 3 → gets connection</code></pre>
+
+<p>Now:</p>
+
+
+<pre class="language-text"><code class="language-text">Semaphore = 0</code></pre>
+
+<p>Thread 4 has to wait.</p>
+
+
+<p>When Thread 1 releases its connection:</p>
+
+
+<pre class="language-text"><code class="language-text">Semaphore = 1</code></pre>
+
+<p>Thread 4 can acquire it.</p>
+
+
+<hr>
+
+
+<h1>🔥 Mutex vs Semaphore</h1>
+
+
+<p>This is a <strong>very common interview follow-up</strong>.</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Mutex</th>
+<th>Semaphore</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Primarily provides mutual exclusion</td>
+<td>Controls access using permits/count</td>
+</tr>
+<tr>
+<td>Usually one thread owns the lock at a time</td>
+<td>Can allow multiple concurrent holders</td>
+</tr>
+<tr>
+<td>Commonly used to protect a critical section</td>
+<td>Commonly used to control a limited resource</td>
+</tr>
+<tr>
+<td>Ownership is typically associated with the locking thread</td>
+<td>No equivalent ownership requirement in the basic semaphore model</td>
+</tr>
+<tr>
+<td>Usually binary: locked/unlocked</td>
+<td>Can be binary or counting</td>
+</tr>
+</tbody></table>
+
+
+<h3>Example</h3>
+
+
+<p><strong>Mutex:</strong></p>
+
+
+<pre class="language-text"><code class="language-text">One bathroom 🚪
+
+Only ONE person at a time.</code></pre>
+
+<p><strong>Semaphore:</strong></p>
+
+
+<pre class="language-text"><code class="language-text">Parking lot 🅿️
+
+5 spaces available.
+
+5 cars → allowed
+6th car → waits</code></pre>
+
+<p>That&#39;s a very useful mental model.</p>
+
+
+<hr>
 </article></main>
 </body>
 </html>
