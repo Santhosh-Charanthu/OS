@@ -2440,7 +2440,7 @@ Thread B</code></pre>
 
 
 <blockquote>
-<p><strong>A semaphore is a synchronization mechanism that uses a counter to control access to shared resources. A thread performs a wait or acquire operation to obtain a permit and a signal or release operation to return it. A counting semaphore can allow multiple threads to access a limited number of identical resources simultaneously.</strong></p>
+<p><strong>A semaphore is a synchronization mechanism that maintains a count of available permits. A thread acquires a permit before accessing a limited resource and releases it when it is finished. If no permit is available, the thread waits. A counting semaphore can therefore allow a limited number of threads to access a resource concurrently.</strong></p>
 </blockquote>
 
 
