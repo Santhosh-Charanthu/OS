@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>1\. What is an Operating System?</title>
+<title>1. What is an Operating System?</title>
 <script>
 (function(){
   var STORAGE_KEY='bn-theme';
@@ -235,12 +235,10 @@ tr:last-child td{border-bottom:0}
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>A program is a passive set of instructions stored on a storage device, whereas a process is a program that is currently being executed.</strong></p>
+<div class="callout callout-cyan" data-fence-callout="cyan"><div class="callout-body"><p><strong>A program is a passive set of instructions stored on a storage device, whereas a process is a program that is currently being executed.</strong></p>
 <p>A program itself doesn&#39;t have an execution state, CPU state, or resources allocated to it. When we run a program, the operating system loads the required parts into memory, allocates resources, and creates a process to execute it.</p>
 <p>For example, a Java application stored as a <code>.class</code> or <code>.jar</code> file is a program. When I run that application, the OS creates a process for its execution.</p>
-</blockquote>
-
+</div></div>
 
 <h3>Simple example</h3>
 
@@ -276,11 +274,9 @@ Someone actually cooking it
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>A process is a program in execution. It is an active entity that contains the program&#39;s instructions along with the execution state and resources required to execute them.</strong></p>
+<div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p><strong>A process is a program in execution. It is an active entity that contains the program&#39;s instructions along with the execution state and resources required to execute them.</strong></p>
 <p>A process has information such as its process ID, program counter, CPU registers, memory information, and scheduling information. The operating system maintains this information using a data structure called the <strong>Process Control Block, or PCB</strong>.</p>
-</blockquote>
-
+</div></div>
 
 <p>That&#39;s a strong fresher-level answer.</p>
 
@@ -297,10 +293,8 @@ Someone actually cooking it
 <p>Say:</p>
 
 
-<blockquote>
-<p><strong>Not exactly. A process includes not only the program&#39;s instructions but also its current execution state, memory, CPU state, and other resources required for execution.</strong></p>
-</blockquote>
-
+<div class="callout callout-purple" data-fence-callout="purple"><div class="callout-body"><p><strong>Not exactly. A process includes not only the program&#39;s instructions but also its current execution state, memory, CPU state, and other resources required for execution.</strong></p>
+</div></div>
 
 <p>That&#39;s an important distinction.</p>
 
@@ -317,11 +311,9 @@ Someone actually cooking it
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>A process typically goes through several states during its lifetime: New, Ready, Running, Waiting or Blocked, and Terminated.</strong></p>
+<div class="callout callout-teal" data-fence-callout="teal"><div class="callout-body"><p><strong>A process typically goes through several states during its lifetime: New, Ready, Running, Waiting or Blocked, and Terminated.</strong></p>
 <p>In the <strong>New</strong> state, the process is being created. In the <strong>Ready</strong> state, it is ready to execute but is waiting for CPU time. In the <strong>Running</strong> state, it is currently executing on the CPU. If it needs to wait for an I/O operation or some event, it moves to the <strong>Waiting or Blocked</strong> state. Once the event is completed, it moves back to Ready. Finally, when the process finishes execution, it enters the <strong>Terminated</strong> state.</p>
-</blockquote>
-
+</div></div>
 
 <h3>🧠 Understand the flow</h3>
 
