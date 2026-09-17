@@ -393,12 +393,10 @@ Someone actually cooking it
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>A Process Control Block, or PCB, is a data structure maintained by the operating system to store important information about a process.</strong></p>
+<div class="callout callout-pink" data-fence-callout="pink"><div class="callout-body"><p><strong>A Process Control Block, or PCB, is a data structure maintained by the operating system to store important information about a process.</strong></p>
 <p>It contains information such as the process ID, process state, program counter, CPU registers, scheduling information, and memory management information.</p>
 <p>The OS uses the PCB to keep track of a process and to save and restore its execution state, especially during context switching.</p>
-</blockquote>
-
+</div></div>
 
 <h3>🧠 Think of it like this</h3>
 
@@ -424,10 +422,8 @@ PCB</code></pre>
 <h3>🔥 Follow-up: Why is PCB important during context switching?</h3>
 
 
-<blockquote>
-<p><strong>When the CPU switches from one process to another, the OS needs to save the current process&#39;s execution state and later restore it. The PCB contains much of the information required to do this.</strong></p>
-</blockquote>
-
+<div class="callout callout-peach" data-fence-callout="peach"><div class="callout-body"><p><strong>When the CPU switches from one process to another, the OS needs to save the current process&#39;s execution state and later restore it. The PCB contains much of the information required to do this.</strong></p>
+</div></div>
 
 <hr>
 
@@ -438,11 +434,9 @@ PCB</code></pre>
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>A Process ID, or PID, is a unique identifier assigned by the operating system to identify a process.</strong></p>
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p><strong>A Process ID, or PID, is a unique identifier assigned by the operating system to identify a process.</strong></p>
 <p>The OS uses the PID to keep track of processes and perform operations such as scheduling, terminating, or managing a particular process.</p>
-</blockquote>
-
+</div></div>
 
 <p>For example, conceptually:</p>
 
@@ -474,12 +468,10 @@ VS Code    → PID 3100</code></pre>
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>Context switching is the process of switching the CPU from one process or thread to another.</strong></p>
+<div class="callout callout-purple" data-fence-callout="purple"><div class="callout-body"><p><strong>Context switching is the process of switching the CPU from one process or thread to another.</strong></p>
 <p>When the OS decides to stop the currently running process or thread, it saves its execution state, such as the program counter and CPU registers. It then loads the saved state of another process or thread, allowing that process or thread to continue execution from where it previously stopped.</p>
 <p>Context switching enables multitasking, but it also introduces some overhead because the CPU spends time saving and restoring state instead of executing application code.</p>
-</blockquote>
-
+</div></div>
 
 <h3>🧠 Example</h3>
 
@@ -547,11 +539,9 @@ Java continues</code></pre>
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>A thread is the smallest unit of execution within a process. A process can contain one or multiple threads, and threads within the same process share resources such as the process&#39;s address space, while each thread maintains its own execution state, such as its stack and CPU registers.</strong></p>
+<div class="callout callout-indigo" data-fence-callout="indigo"><div class="callout-body"><p><strong>A thread is the smallest unit of execution within a process. A process can contain one or multiple threads, and threads within the same process share resources such as the process&#39;s address space, while each thread maintains its own execution state, such as its stack and CPU registers.</strong></p>
 <p><strong>Threads allow a process to perform multiple tasks concurrently.</strong></p>
-</blockquote>
-
+</div></div>
 
 <h3>🧠 Simple picture</h3>
 
@@ -585,12 +575,10 @@ Java continues</code></pre>
 <h3>🎤 Interview answer</h3>
 
 
-<blockquote>
-<p><strong>A process is an independent program in execution, whereas a thread is an execution unit within a process.</strong></p>
+<div class="callout callout-teal" data-fence-callout="teal"><div class="callout-body"><p><strong>A process is an independent program in execution, whereas a thread is an execution unit within a process.</strong></p>
 <p><strong>Processes generally have separate address spaces, while threads belonging to the same process share the process&#39;s address space and many resources. Because of this, creating and switching between threads is generally less expensive than doing the same with separate processes, although the exact cost depends on the operating system.</strong></p>
 <p><strong>However, sharing memory between threads also means that synchronization is required when multiple threads access shared data.</strong></p>
-</blockquote>
-
+</div></div>
 
 <h3>🔥 Comparison</h3>
 
