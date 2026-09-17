@@ -1,0 +1,2691 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>1\. What is an Operating System?</title>
+<script>
+(function(){
+  var STORAGE_KEY='bn-theme';
+  var root=document.documentElement;
+  function isDarkOS(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches}
+  function current(){var s=localStorage.getItem(STORAGE_KEY);return s?s:(isDarkOS()?'dark':'light')}
+  var MOON_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>';
+  var SUN_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+  function apply(t){if(t==='dark'){root.classList.add('dark');root.classList.remove('light')}else{root.classList.add('light');root.classList.remove('dark')}var btn=document.getElementById('theme-toggle');if(btn)btn.innerHTML=t==='dark'?SUN_SVG:MOON_SVG}
+  apply(current());
+  window.addEventListener('DOMContentLoaded',function(){
+    apply(current());
+    var btn=document.getElementById('theme-toggle');
+    if(!btn)return;
+    btn.addEventListener('click',function(){
+      var next=current()==='dark'?'light':'dark';
+      localStorage.setItem(STORAGE_KEY,next);
+      apply(next);
+    });
+  });
+})();
+</script>
+<style>
+/* ── Light theme (default) ── */
+:root{
+  --fg:oklch(0.22 0.03 250);--muted-fg:oklch(0.48 0.03 250);--border:oklch(0.9 0.02 230);
+  --accent:oklch(0.62 0.16 240);--accent-soft:color-mix(in oklab,oklch(0.62 0.16 240) 10%,transparent);
+  --card:oklch(1 0 0);--code-bg:oklch(0.19 0.02 250);--code-fg:oklch(0.95 0.01 230);--code-border:oklch(0.3 0.03 250);
+  --inline-code-bg:#f1f5f9;--inline-code-fg:#0c4a6e;
+  --page-bg:linear-gradient(180deg,oklch(0.97 0.03 230) 0%,oklch(0.99 0.01 230) 100%);
+  --doc-shadow:0 20px 60px -20px rgba(2,132,199,.25),0 4px 14px -4px rgba(15,23,42,.08);
+  --thead-bg:color-mix(in oklab,oklch(0.62 0.16 240) 10%,transparent);
+  --toggle-bg:oklch(0.9 0.02 230);--toggle-fg:oklch(0.35 0.04 250);--toggle-hover:oklch(0.84 0.04 230);
+}
+/* ── Dark theme ── */
+.dark{
+  --fg:oklch(0.95 0.01 230);--muted-fg:oklch(0.7 0.03 240);--border:oklch(0.3 0.03 250);
+  --accent:oklch(0.72 0.14 235);--accent-soft:color-mix(in oklab,oklch(0.72 0.14 235) 12%,transparent);
+  --card:oklch(0.21 0.025 250);--code-bg:oklch(0.14 0.02 250);--code-fg:oklch(0.95 0.01 230);--code-border:oklch(0.28 0.03 250);
+  --inline-code-bg:oklch(0.25 0.025 250);--inline-code-fg:oklch(0.95 0.01 230);
+  --page-bg:linear-gradient(180deg,oklch(0.19 0.03 250) 0%,oklch(0.16 0.02 250) 100%);
+  --doc-shadow:0 20px 60px -20px rgba(0,0,0,.5),0 4px 14px -4px rgba(0,0,0,.3);
+  --thead-bg:color-mix(in oklab,oklch(0.72 0.14 235) 10%,transparent);
+  --toggle-bg:oklch(0.28 0.03 250);--toggle-fg:oklch(0.85 0.02 230);--toggle-hover:oklch(0.33 0.04 250);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--page-bg);color:var(--fg);min-height:100vh;padding:32px 16px;line-height:1.75;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+.page{max-width:920px;margin:0 auto}
+.doc{background:var(--card);border-radius:18px;box-shadow:var(--doc-shadow);padding:clamp(24px,5vw,60px);border:1px solid rgba(148,163,184,.2);transition:background .2s,box-shadow .2s}
+/* theme toggle button */
+.theme-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--toggle-bg);color:var(--toggle-fg);border:1px solid var(--border);cursor:pointer;font-size:16px;transition:background .15s,transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.theme-toggle:hover{background:var(--toggle-hover);transform:scale(1.08)}
+.title-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin:0 0 1.2em;padding-bottom:.5em;border-bottom:1px solid var(--border)}
+.title-row h1{margin:0;padding:0;border:0;flex:1 1 auto;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;border:1px solid color-mix(in oklab,var(--accent) 30%,transparent);white-space:nowrap;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;box-shadow:0 1px 2px color-mix(in oklab,var(--accent) 15%,transparent);flex:0 0 auto;margin-left:auto;margin-right:8px}
+.badge:hover{background:color-mix(in oklab,var(--accent) 18%,transparent);transform:translateY(-1px);box-shadow:0 6px 16px -6px color-mix(in oklab,var(--accent) 40%,transparent)}
+h1,h2,h3,h4,h5,h6{font-weight:700;line-height:1.25;margin:1.8em 0 .6em;letter-spacing:-.01em;color:var(--fg)}
+h1{font-size:2.15rem;border-bottom:1px solid var(--border);padding-bottom:.4em;margin-top:0}
+h2{font-size:1.6rem}
+h3{font-size:1.3rem}
+h4{font-size:1.1rem}
+p{margin:.9em 0}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+strong{font-weight:700}
+del{color:var(--muted-fg)}
+ul,ol{margin:.8em 0;padding-left:1.6em}
+li{margin:.25em 0}
+blockquote{margin:1.2em 0;padding:.5em 1.1em;border-left:4px solid var(--accent);background:var(--accent-soft);color:var(--muted-fg);border-radius:0 .5rem .5rem 0}
+hr{margin:2em 0;border:0;border-top:1px solid var(--border)}
+img{max-width:100%;border-radius:.5rem;margin:1em 0}
+code{font-family:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.9em;padding:.15em .4em;background:var(--inline-code-bg);color:var(--inline-code-fg);border-radius:.35rem;border:1px solid var(--border)}
+pre{margin:1.2em 0;padding:1rem 1.1rem;background:var(--code-bg);color:var(--code-fg);border-radius:.7rem;overflow-x:auto;font-size:.9rem;line-height:1.55;border:1px solid var(--code-border)}
+pre code{background:transparent;border:0;padding:0;color:inherit;font-size:inherit}
+table{width:100%;border-collapse:separate;border-spacing:0;margin:1.2em 0;display:table;table-layout:auto;border:1px solid var(--border);border-radius:.6rem;overflow:hidden}
+thead{background:var(--thead-bg)}
+th,td{padding:.65em .9em;border-bottom:1px solid var(--border);text-align:left}
+th{font-weight:600}
+tr:last-child td{border-bottom:0}
+.callout{margin:1.5em 0;padding:1rem 1.1rem;border-radius:.8rem;border:1px solid var(--callout-border,var(--border));background:var(--callout-bg,var(--inline-code-bg));box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.callout-title{display:flex;align-items:center;gap:.55rem;font-weight:700;font-size:1rem;margin-bottom:.5rem;color:var(--callout-fg,var(--fg))}
+.callout-icon{font-size:1.15rem;line-height:1}
+.callout-body>:first-child{margin-top:0}
+.callout-body>:last-child{margin-bottom:0}
+.callout-note{--callout-bg:color-mix(in oklab,oklch(0.65 0.16 240) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.65 0.16 240) 40%,transparent);--callout-fg:oklch(0.4 0.15 240)}
+.callout-important{--callout-bg:color-mix(in oklab,oklch(0.65 0.22 300) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.65 0.22 300) 40%,transparent);--callout-fg:oklch(0.42 0.2 300)}
+.callout-warning{--callout-bg:color-mix(in oklab,oklch(0.75 0.17 70) 15%,transparent);--callout-border:color-mix(in oklab,oklch(0.75 0.17 70) 45%,transparent);--callout-fg:oklch(0.45 0.18 60)}
+.callout-tip{--callout-bg:color-mix(in oklab,oklch(0.72 0.18 155) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.72 0.18 155) 40%,transparent);--callout-fg:oklch(0.4 0.15 155)}
+.callout-question{--callout-bg:color-mix(in oklab,oklch(0.7 0.18 200) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.7 0.18 200) 40%,transparent);--callout-fg:oklch(0.4 0.15 200)}
+.callout-observation{--callout-bg:color-mix(in oklab,oklch(0.7 0.15 180) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.7 0.15 180) 40%,transparent);--callout-fg:oklch(0.4 0.13 180)}
+.callout-complexity{--callout-bg:color-mix(in oklab,oklch(0.7 0.15 25) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.7 0.15 25) 40%,transparent);--callout-fg:oklch(0.44 0.16 25)}
+.callout-summary{--callout-bg:color-mix(in oklab,oklch(0.65 0.14 260) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.65 0.14 260) 40%,transparent);--callout-fg:oklch(0.4 0.13 260)}
+.callout-advantage{--callout-bg:color-mix(in oklab,oklch(0.72 0.18 155) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.72 0.18 155) 40%,transparent);--callout-fg:oklch(0.4 0.15 155)}
+.callout-disadvantage{--callout-bg:color-mix(in oklab,oklch(0.7 0.2 20) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.7 0.2 20) 40%,transparent);--callout-fg:oklch(0.45 0.19 20)}
+.callout-blue{--callout-bg:color-mix(in oklab,oklch(0.65 0.16 240) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.65 0.16 240) 40%,transparent);--callout-fg:oklch(0.4 0.15 240)}
+.callout-green{--callout-bg:color-mix(in oklab,oklch(0.72 0.18 155) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.72 0.18 155) 40%,transparent);--callout-fg:oklch(0.4 0.15 155)}
+.callout-red{--callout-bg:color-mix(in oklab,oklch(0.65 0.22 20) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.65 0.22 20) 45%,transparent);--callout-fg:oklch(0.42 0.2 20)}
+.callout-yellow{--callout-bg:color-mix(in oklab,oklch(0.82 0.18 90) 15%,transparent);--callout-border:color-mix(in oklab,oklch(0.82 0.18 90) 45%,transparent);--callout-fg:oklch(0.45 0.16 80)}
+.callout-orange{--callout-bg:color-mix(in oklab,oklch(0.75 0.18 55) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.75 0.18 55) 45%,transparent);--callout-fg:oklch(0.44 0.17 45)}
+.callout-purple{--callout-bg:color-mix(in oklab,oklch(0.65 0.2 310) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.65 0.2 310) 40%,transparent);--callout-fg:oklch(0.42 0.18 310)}
+.callout-gray{--callout-bg:color-mix(in oklab,oklch(0.6 0.01 250) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.6 0.01 250) 40%,transparent);--callout-fg:oklch(0.4 0.02 250)}
+.callout-teal{--callout-bg:color-mix(in oklab,oklch(0.68 0.15 185) 11%,transparent);--callout-border:color-mix(in oklab,oklch(0.68 0.15 185) 40%,transparent);--callout-fg:oklch(0.38 0.13 185)}
+.callout-cyan{--callout-bg:color-mix(in oklab,oklch(0.72 0.14 210) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.72 0.14 210) 42%,transparent);--callout-fg:oklch(0.38 0.12 210)}
+.callout-pink{--callout-bg:color-mix(in oklab,oklch(0.72 0.2 350) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.72 0.2 350) 40%,transparent);--callout-fg:oklch(0.42 0.18 350)}
+.callout-rose{--callout-bg:color-mix(in oklab,oklch(0.67 0.22 5) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.67 0.22 5) 42%,transparent);--callout-fg:oklch(0.42 0.2 5)}
+.callout-indigo{--callout-bg:color-mix(in oklab,oklch(0.6 0.2 270) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.6 0.2 270) 40%,transparent);--callout-fg:oklch(0.4 0.18 270)}
+.callout-violet{--callout-bg:color-mix(in oklab,oklch(0.63 0.22 295) 10%,transparent);--callout-border:color-mix(in oklab,oklch(0.63 0.22 295) 40%,transparent);--callout-fg:oklch(0.4 0.2 295)}
+.callout-lime{--callout-bg:color-mix(in oklab,oklch(0.78 0.2 125) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.78 0.2 125) 42%,transparent);--callout-fg:oklch(0.4 0.16 125)}
+.callout-amber{--callout-bg:color-mix(in oklab,oklch(0.8 0.18 75) 14%,transparent);--callout-border:color-mix(in oklab,oklch(0.8 0.18 75) 45%,transparent);--callout-fg:oklch(0.44 0.16 65)}
+.callout-sky{--callout-bg:color-mix(in oklab,oklch(0.7 0.15 225) 11%,transparent);--callout-border:color-mix(in oklab,oklch(0.7 0.15 225) 40%,transparent);--callout-fg:oklch(0.38 0.14 225)}
+.callout-slate{--callout-bg:color-mix(in oklab,oklch(0.58 0.04 240) 12%,transparent);--callout-border:color-mix(in oklab,oklch(0.58 0.04 240) 40%,transparent);--callout-fg:oklch(0.36 0.04 240)}
+.callout-peach{--callout-bg:color-mix(in oklab,#ffb5b5 18%,transparent);--callout-border:color-mix(in oklab,#ffb5b5 50%,transparent);--callout-fg:oklch(0.42 0.14 15)}
+/* Prism token colors — same palette as the live preview */
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:oklch(0.65 0.03 250)}
+.token.punctuation{color:oklch(0.85 0.02 230)}
+.token.property,.token.tag,.token.constant,.token.symbol,.token.deleted{color:oklch(0.75 0.18 20)}
+.token.boolean,.token.number{color:oklch(0.8 0.15 70)}
+.token.selector,.token.attr-name,.token.string,.token.char,.token.builtin,.token.inserted{color:oklch(0.82 0.15 155)}
+.token.operator,.token.entity,.token.url,.token.variable{color:oklch(0.85 0.1 200)}
+.token.atrule,.token.attr-value,.token.function,.token.class-name{color:oklch(0.82 0.16 300)}
+.token.keyword{color:oklch(0.78 0.17 260)}
+.token.regex,.token.important{color:oklch(0.8 0.18 60)}
+@media (prefers-color-scheme:dark){:root:not(.light){--fg:oklch(0.95 0.01 230);--muted-fg:oklch(0.7 0.03 240);--border:oklch(0.3 0.03 250);--accent:oklch(0.72 0.14 235);--accent-soft:color-mix(in oklab,oklch(0.72 0.14 235) 12%,transparent);--card:oklch(0.21 0.025 250);--code-bg:oklch(0.14 0.02 250);--code-fg:oklch(0.95 0.01 230);--code-border:oklch(0.28 0.03 250);--inline-code-bg:oklch(0.25 0.025 250);--inline-code-fg:oklch(0.95 0.01 230);--page-bg:linear-gradient(180deg,oklch(0.19 0.03 250) 0%,oklch(0.16 0.02 250) 100%);--doc-shadow:0 20px 60px -20px rgba(0,0,0,.5),0 4px 14px -4px rgba(0,0,0,.3);--thead-bg:color-mix(in oklab,oklch(0.72 0.14 235) 10%,transparent);--toggle-bg:oklch(0.28 0.03 250);--toggle-fg:oklch(0.85 0.02 230);--toggle-hover:oklch(0.33 0.04 250)}}
+@media (max-width:640px){body{padding:12px 8px}.doc{padding:20px 16px;border-radius:12px}h1{font-size:1.7rem}.title-row{align-items:flex-start}.badge{font-size:12px;padding:5px 10px}}
+@media print{body{background:#fff;padding:0}.doc{box-shadow:none;border:0;padding:0;max-width:none}.theme-toggle{display:none}}
+</style>
+</head>
+<body>
+<button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></button>
+<main class="page"><article class="doc"><h1>1. What is an Operating System?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-blue" data-fence-callout="blue"><div class="callout-body"><p><strong>An Operating System is system software that acts as an interface between the user applications and the computer hardware. It manages hardware resources such as the CPU, memory, storage, and I/O devices, and provides services that applications need to run.</strong></p>
+<p>For example, when I run a Java application, I don&#39;t directly tell the CPU or memory how to execute it. The operating system manages those resources and provides the environment in which my application runs.</p>
+</div></div>
+
+<h3>If interviewer asks: <strong>&quot;What are the main responsibilities of an OS?&quot;</strong></h3>
+
+
+<p>You can say:</p>
+
+
+<blockquote>
+<p><strong>The major responsibilities of an OS are process management, memory management, file and storage management, I/O device management, CPU scheduling, and security and resource management.</strong></p>
+</blockquote>
+
+
+<h3>🧠 Remember</h3>
+
+
+<p><strong>OS = Interface + Resource Manager</strong></p>
+
+
+<hr>
+
+
+<h1>2. What are the main functions of an Operating System?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p><strong>The main functions of an operating system are process management, memory management, file management, I/O management, CPU scheduling, and security.</strong></p>
+<p>In process management, the OS creates and manages processes and threads. In memory management, it allocates and deallocates memory and manages virtual memory. It also manages files and storage, controls I/O devices, schedules CPU time among processes and threads, and provides security and access control.</p>
+</div></div>
+
+<h3>If interviewer asks: <strong>&quot;Can you explain each briefly?&quot;</strong></h3>
+
+
+<p>You can answer:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What OS does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Process Management</strong></td>
+<td>Creates, schedules, and terminates processes</td>
+</tr>
+<tr>
+<td><strong>Memory Management</strong></td>
+<td>Allocates memory and manages virtual memory</td>
+</tr>
+<tr>
+<td><strong>CPU Scheduling</strong></td>
+<td>Decides which runnable process/thread gets CPU time</td>
+</tr>
+<tr>
+<td><strong>File Management</strong></td>
+<td>Creates, reads, writes, and organizes files</td>
+</tr>
+<tr>
+<td><strong>I/O Management</strong></td>
+<td>Manages devices such as keyboard, disk, network</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Controls access to resources</td>
+</tr>
+<tr>
+<td><strong>Resource Management</strong></td>
+<td>Allocates hardware resources among programs</td>
+</tr>
+</tbody></table>
+
+
+<h3>🧠 Interview trick</h3>
+
+
+<p>Don&#39;t just list them. Give <strong>one line explaining each</strong>. That makes your answer sound like you understand the concept rather than memorized a list.</p>
+
+
+<hr>
+
+
+<h1>3. What is the difference between a Program and a Process?</h1>
+
+
+<p>This is <strong>very important</strong>. ⭐⭐⭐⭐⭐</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A program is a passive set of instructions stored on a storage device, whereas a process is a program that is currently being executed.</strong></p>
+<p>A program itself doesn&#39;t have an execution state, CPU state, or resources allocated to it. When we run a program, the operating system loads the required parts into memory, allocates resources, and creates a process to execute it.</p>
+<p>For example, a Java application stored as a <code>.class</code> or <code>.jar</code> file is a program. When I run that application, the OS creates a process for its execution.</p>
+</blockquote>
+
+
+<h3>Simple example</h3>
+
+
+<p>Think about a recipe:</p>
+
+
+<pre class="language-text"><code class="language-text">Recipe stored in a book
+        ↓
+      Program
+
+Someone actually cooking it
+        ↓
+      Process</code></pre>
+
+<h3>⭐ If interviewer asks: &quot;Can multiple processes come from one program?&quot;</h3>
+
+
+<p>Say:</p>
+
+
+<blockquote>
+<p><strong>Yes. The same program can be executed multiple times, and each execution can result in a separate process with its own execution state and resources.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>4. What is a Process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A process is a program in execution. It is an active entity that contains the program&#39;s instructions along with the execution state and resources required to execute them.</strong></p>
+<p>A process has information such as its process ID, program counter, CPU registers, memory information, and scheduling information. The operating system maintains this information using a data structure called the <strong>Process Control Block, or PCB</strong>.</p>
+</blockquote>
+
+
+<p>That&#39;s a strong fresher-level answer.</p>
+
+
+<h3>If interviewer asks:</h3>
+
+
+<p><strong>&quot;Is a process just a program loaded into memory?&quot;</strong></p>
+
+
+<p>Don&#39;t say simply yes.</p>
+
+
+<p>Say:</p>
+
+
+<blockquote>
+<p><strong>Not exactly. A process includes not only the program&#39;s instructions but also its current execution state, memory, CPU state, and other resources required for execution.</strong></p>
+</blockquote>
+
+
+<p>That&#39;s an important distinction.</p>
+
+
+<hr>
+
+
+<h1>5. What are the different states of a Process?</h1>
+
+
+<p>This is another <strong>must-know OS question</strong>. ⭐⭐⭐⭐⭐</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A process typically goes through several states during its lifetime: New, Ready, Running, Waiting or Blocked, and Terminated.</strong></p>
+<p>In the <strong>New</strong> state, the process is being created. In the <strong>Ready</strong> state, it is ready to execute but is waiting for CPU time. In the <strong>Running</strong> state, it is currently executing on the CPU. If it needs to wait for an I/O operation or some event, it moves to the <strong>Waiting or Blocked</strong> state. Once the event is completed, it moves back to Ready. Finally, when the process finishes execution, it enters the <strong>Terminated</strong> state.</p>
+</blockquote>
+
+
+<h3>🧠 Understand the flow</h3>
+
+
+<pre class="language-text"><code class="language-text">                 ┌─────────────┐
+                 │     New     │
+                 └──────┬──────┘
+                        ↓
+                 ┌─────────────┐
+          ┌──────│    Ready    │◄──────────┐
+          │      └──────┬──────┘           │
+          │             ↓                  │
+          │      ┌─────────────┐           │
+          │      │   Running   │           │
+          │      └───┬─────┬───┘           │
+          │          │     │               │
+          │          │     ↓               │
+          │          │  Terminated         │
+          │          │                     │
+          │          ↓                     │
+          │      ┌─────────────┐           │
+          └──────│   Waiting   │───────────┘
+                 │  / Blocked  │
+                 └─────────────┘</code></pre>
+
+<h3>The important transitions</h3>
+
+
+<p><strong>New → Ready</strong></p>
+
+
+<p>Process has been created and is ready to run.</p>
+
+
+<p><strong>Ready → Running</strong></p>
+
+
+<p>CPU scheduler selects it.</p>
+
+
+<p><strong>Running → Waiting</strong></p>
+
+
+<p>Process needs I/O or has to wait for an event.</p>
+
+
+<p><strong>Waiting → Ready</strong></p>
+
+
+<p>The required event/I/O completes.</p>
+
+
+<p><strong>Running → Ready</strong></p>
+
+
+<p>The OS preempts it, for example because its time slice expires.</p>
+
+
+<p><strong>Running → Terminated</strong></p>
+
+
+<p>Process finishes execution.</p>
+
+
+<hr>
+
+
+<p>Absolutely. Let&#39;s continue with <strong>Q6–Q10</strong>. These are still part of <strong>Process &amp; Thread fundamentals</strong>, so make sure you understand the &quot;why&quot; rather than memorizing the wording.</p>
+
+
+<hr>
+
+
+<h1>6. What is a Process Control Block (PCB)?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A Process Control Block, or PCB, is a data structure maintained by the operating system to store important information about a process.</strong></p>
+<p>It contains information such as the process ID, process state, program counter, CPU registers, scheduling information, and memory management information.</p>
+<p>The OS uses the PCB to keep track of a process and to save and restore its execution state, especially during context switching.</p>
+</blockquote>
+
+
+<h3>🧠 Think of it like this</h3>
+
+
+<pre class="language-text"><code class="language-text">Process
+   ↓
+OS needs to remember everything about it
+   ↓
+PCB</code></pre>
+
+<p>For example:</p>
+
+
+<pre class="language-text"><code class="language-text">PCB
+├── PID
+├── Process State
+├── Program Counter
+├── CPU Registers
+├── Scheduling Information
+├── Memory Information
+└── I/O Information</code></pre>
+
+<h3>🔥 Follow-up: Why is PCB important during context switching?</h3>
+
+
+<blockquote>
+<p><strong>When the CPU switches from one process to another, the OS needs to save the current process&#39;s execution state and later restore it. The PCB contains much of the information required to do this.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>7. What is a Process ID (PID)?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A Process ID, or PID, is a unique identifier assigned by the operating system to identify a process.</strong></p>
+<p>The OS uses the PID to keep track of processes and perform operations such as scheduling, terminating, or managing a particular process.</p>
+</blockquote>
+
+
+<p>For example, conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Chrome     → PID 1200
+Java       → PID 2450
+VS Code    → PID 3100</code></pre>
+
+<p>The actual PID values depend on the operating system and current processes.</p>
+
+
+<h3>🔥 Follow-up: Why do we need a PID?</h3>
+
+
+<blockquote>
+<p><strong>Because multiple processes can exist simultaneously, the OS needs a way to uniquely identify and manage each process.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>8. What is Context Switching? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is <strong>very important</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Context switching is the process of switching the CPU from one process or thread to another.</strong></p>
+<p>When the OS decides to stop the currently running process or thread, it saves its execution state, such as the program counter and CPU registers. It then loads the saved state of another process or thread, allowing that process or thread to continue execution from where it previously stopped.</p>
+<p>Context switching enables multitasking, but it also introduces some overhead because the CPU spends time saving and restoring state instead of executing application code.</p>
+</blockquote>
+
+
+<h3>🧠 Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">CPU
+ ↓
+Java</code></pre>
+
+<p>Java is executing.</p>
+
+
+<p>Then the scheduler decides:</p>
+
+
+<blockquote>
+<p>&quot;Give CPU to Chrome.&quot;</p>
+</blockquote>
+
+
+<p>The OS does roughly:</p>
+
+
+<pre class="language-text"><code class="language-text">Java running
+     ↓
+Save Java's context
+     ↓
+Load Chrome's context
+     ↓
+Chrome runs</code></pre>
+
+<p>Later:</p>
+
+
+<pre class="language-text"><code class="language-text">Chrome
+   ↓
+Save Chrome's context
+   ↓
+Load Java's context
+   ↓
+Java continues</code></pre>
+
+<h3>🔥 Important follow-up</h3>
+
+
+<p><strong>Does context switching happen only between processes?</strong></p>
+
+
+<p>No.</p>
+
+
+<blockquote>
+<p><strong>Context switching can happen between processes as well as between threads.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>9. What is a Thread?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A thread is the smallest unit of execution within a process. A process can contain one or multiple threads, and threads within the same process share resources such as the process&#39;s address space, while each thread maintains its own execution state, such as its stack and CPU registers.</strong></p>
+<p><strong>Threads allow a process to perform multiple tasks concurrently.</strong></p>
+</blockquote>
+
+
+<h3>🧠 Simple picture</h3>
+
+
+<pre class="language-text"><code class="language-text">             Process
+                │
+       ┌────────┼────────┐
+       ↓        ↓        ↓
+   Thread 1  Thread 2  Thread 3</code></pre>
+
+<p>For example, a server process might have different threads handling different pieces of work.</p>
+
+
+<h3>🔥 Follow-up: Why do we need threads?</h3>
+
+
+<blockquote>
+<p><strong>Threads allow multiple tasks within the same process to make progress concurrently while sharing the process&#39;s resources. This can improve responsiveness and resource utilization.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>10. What is the difference between a Process and a Thread? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is one of the <strong>most commonly asked OS questions</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A process is an independent program in execution, whereas a thread is an execution unit within a process.</strong></p>
+<p><strong>Processes generally have separate address spaces, while threads belonging to the same process share the process&#39;s address space and many resources. Because of this, creating and switching between threads is generally less expensive than doing the same with separate processes, although the exact cost depends on the operating system.</strong></p>
+<p><strong>However, sharing memory between threads also means that synchronization is required when multiple threads access shared data.</strong></p>
+</blockquote>
+
+
+<h3>🔥 Comparison</h3>
+
+
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th>Thread</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Independent execution environment</td>
+<td>Execution unit within a process</td>
+</tr>
+<tr>
+<td>Separate address space</td>
+<td>Threads share process address space</td>
+</tr>
+<tr>
+<td>More resource overhead</td>
+<td>Generally lower overhead</td>
+</tr>
+<tr>
+<td>Communication usually requires IPC mechanisms</td>
+<td>Communication can use shared memory</td>
+</tr>
+<tr>
+<td>Failure is generally more isolated</td>
+<td>A serious thread failure can affect the process</td>
+</tr>
+<tr>
+<td>Context switching is generally more expensive</td>
+<td>Generally cheaper</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h1>11. Why are threads called lightweight processes?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Threads are called lightweight processes because they require fewer resources to create and manage compared to processes. Threads within the same process share resources such as the address space, code, and open files, whereas separate processes generally have separate address spaces and more independent resources.</strong></p>
+<p>Therefore, thread creation and context switching are generally less expensive than process creation and context switching.</p>
+</blockquote>
+
+
+<h3>🧠 Simple way to remember</h3>
+
+
+<pre class="language-text"><code class="language-text">Process
+├── Own memory space
+├── Own resources
+└── Thread(s)
+
+Thread
+├── Shares process memory
+├── Own stack
+└── Own CPU state</code></pre>
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>Does lightweight mean threads don&#39;t have their own memory?</strong></p>
+
+
+<blockquote>
+<p><strong>No. Threads share the process&#39;s address space, but each thread still has its own stack, registers, program counter, and execution state.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>12. What resources are shared between threads of the same process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Threads within the same process share the process&#39;s address space and resources such as code, global variables, heap memory, and open files. However, each thread maintains its own execution-related information such as its stack, registers, and program counter.</strong></p>
+</blockquote>
+
+
+<p>Think:</p>
+
+
+<pre class="language-text"><code class="language-text">             PROCESS
+┌──────────────────────────────┐
+│                              │
+│   Code        ← Shared       │
+│   Heap        ← Shared       │
+│   Global data ← Shared       │
+│   Open files  ← Shared       │
+│                              │
+│   ┌──────┐ ┌──────┐ ┌──────┐│
+│   │ T1   │ │ T2   │ │ T3   ││
+│   │Stack │ │Stack │ │Stack ││
+│   └──────┘ └──────┘ └──────┘│
+│      Private   Private       │
+└──────────────────────────────┘</code></pre>
+
+<h3>⭐ Important distinction</h3>
+
+
+<p><strong>Shared:</strong></p>
+
+
+<ul>
+<li>Code</li>
+<li>Heap</li>
+<li>Global/static data</li>
+<li>Many process resources, such as open files</li>
+</ul>
+
+
+<p><strong>Private to each thread:</strong></p>
+
+
+<ul>
+<li>Stack</li>
+<li>Registers</li>
+<li>Program counter</li>
+<li>Thread-local storage</li>
+</ul>
+
+
+<hr>
+
+
+<h1>13. What resources are private to each thread?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Each thread has its own program counter, CPU registers, and stack. These are private because each thread can be executing a different function or instruction at the same time and therefore needs its own execution state.</strong></p>
+</blockquote>
+
+
+<p>For example:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1 → executing function A
+Thread 2 → executing function B</code></pre>
+
+<p>They can&#39;t use the same stack because their function calls and local variables are different.</p>
+
+
+<p>So:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1
+ ├── Program Counter
+ ├── Registers
+ └── Stack
+
+Thread 2
+ ├── Program Counter
+ ├── Registers
+ └── Stack</code></pre>
+
+<hr>
+
+
+<h1>14. What is Multithreading?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Multithreading is the ability of a process to execute multiple threads concurrently. Each thread can perform a different task while sharing the resources of the same process.</strong></p>
+<p>For example, a web server can use multiple threads to handle multiple client requests, allowing different requests to make progress without requiring a completely separate process for each request.</p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Imagine your backend:</p>
+
+
+<pre class="language-text"><code class="language-text">             Backend Process
+                   │
+       ┌───────────┼───────────┐
+       ↓           ↓           ↓
+    Thread 1    Thread 2    Thread 3
+     Login       Profile     Booking</code></pre>
+
+<p>The threads share the process&#39;s resources.</p>
+
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>What is the advantage of multithreading?</strong></p>
+
+
+<blockquote>
+<p><strong>It can improve responsiveness and resource utilization and allow multiple tasks to make progress concurrently. It can also take advantage of multiple CPU cores for parallel execution.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>15. What are the advantages and disadvantages of Multithreading?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>The main advantages of multithreading are improved responsiveness, better CPU utilization, the ability to perform multiple tasks concurrently, and efficient sharing of resources within a process.</strong></p>
+<p><strong>However, multithreading also introduces challenges such as race conditions, synchronization overhead, deadlocks, and the difficulty of debugging concurrent programs.</strong></p>
+</blockquote>
+
+
+<div class="callout callout-advantage"><div class="callout-title"><span class="callout-icon">✅</span><span>Advantages</span></div><div class="callout-body"><p><strong>1. Better responsiveness</strong></p>
+<p>One thread can continue while another waits for I/O.</p>
+<p><strong>2. Better CPU utilization</strong></p>
+<p>Multiple threads can keep CPU cores busy.</p>
+<p><strong>3. Resource sharing</strong></p>
+<p>Threads share the process&#39;s memory and resources.</p>
+<p><strong>4. Concurrency</strong></p>
+<p>Multiple tasks can make progress at the same time.</p>
+</div></div>
+<div class="callout callout-disadvantage"><div class="callout-title"><span class="callout-icon">❌</span><span>Disadvantages ⚠️</span></div><div class="callout-body"><p><strong>1. Race conditions</strong></p>
+<p>Multiple threads access shared data incorrectly.</p>
+<p><strong>2. Synchronization overhead</strong></p>
+<p>Locks and other synchronization mechanisms add overhead.</p>
+<p><strong>3. Deadlocks</strong></p>
+<p>Threads can become stuck waiting for each other.</p>
+<p><strong>4. Debugging difficulty</strong></p>
+<p>Concurrency bugs can be difficult to reproduce.</p>
+</div></div>
+<h1>🧠 Q11–Q15 in one picture</h1>
+
+
+<p>This is the mental model I want you to have:</p>
+
+
+<pre class="language-text"><code class="language-text">                 PROCESS
+                    │
+        ┌───────────┼───────────┐
+        ↓           ↓           ↓
+     Thread 1    Thread 2    Thread 3
+        │           │           │
+        └───────────┼───────────┘
+                    ↓
+          Shared Process Resources
+          ┌──────────────────────┐
+          │ Code                 │
+          │ Heap                 │
+          │ Global Data          │
+          │ Open Files           │
+          └──────────────────────┘
+
+Each Thread separately has:
+ ├── Stack
+ ├── Registers
+ └── Program Counter
+
+             ↓
+        Multithreading
+             ↓
+    Better concurrency
+             ↓
+       BUT ⚠️
+             ↓
+   Race Conditions
+   Synchronization
+   Deadlocks</code></pre>
+
+<hr>
+
+
+<h1>16. What happens when a process creates a child process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-blue" data-fence-callout="blue"><div class="callout-body"><p>When a process creates another process, the original process is called the parent process and the newly created process is called the child process. The operating system assigns the child process its own process ID and creates the necessary process management information for it.</p>
+<p>The child may inherit or share certain resources from the parent depending on the operating system and how the process is created, but the child is a separate process with its own execution state.</p>
+</div></div>
+
+<h3>Simple picture</h3>
+
+
+<pre class="language-text"><code class="language-text">        Parent Process
+              │
+        creates child
+              ↓
+        Child Process</code></pre>
+
+<p>For example, in Unix-like systems, a process can create another process using <code>fork()</code>.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Before fork():
+
+      Parent
+
+After fork():
+
+      Parent
+        │
+        └────── Child</code></pre>
+
+<p>Both can then execute independently.</p>
+
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>Does the child have the same PID as the parent?</strong></p>
+
+
+<blockquote>
+<p><strong>No. The child receives a different PID. The parent and child are separate processes.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>17. What is a Parent Process and Child Process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>A parent process is a process that creates another process, while the newly created process is called the child process. The operating system maintains a relationship between them so that the parent can manage or wait for its child.</p>
+<p>The child has its own process ID and execution state, although it may inherit certain attributes or resources from the parent depending on the operating system.</p>
+</div></div>
+
+<h3>Example</h3>
+
+
+<pre class="language-text"><code class="language-text">             OS
+              │
+        Parent Process
+              │
+       ┌──────┴──────┐
+       ↓             ↓
+    Child A       Child B</code></pre>
+
+<p>A parent can have multiple children.</p>
+
+
+<hr>
+
+
+<h1>18. What is a Zombie Process? ☠️</h1>
+
+
+<p>This is a very common interview question.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-yellow" data-fence-callout="yellow"><div class="callout-body"><p>A zombie process is a process that has finished execution, but its entry in the process table still exists because its parent has not yet collected its termination status.</p>
+<p>The process itself is no longer executing, but the OS keeps a small amount of information about it, such as its PID and exit status, so that the parent can retrieve that information.</p>
+</div></div>
+
+<h3>Understand the flow</h3>
+
+
+<pre class="language-text"><code class="language-text">Parent
+  │
+  └── creates Child
+          │
+          ↓
+       Running
+          │
+          ↓
+       Finishes
+          │
+          ↓
+       Zombie
+          │
+          ↓
+ Parent collects exit status
+          │
+          ↓
+       Removed</code></pre>
+
+<p>The parent typically does this through a mechanism such as <code>wait()</code>/<code>waitpid()</code> on Unix-like systems.</p>
+
+
+<h3>🧠 Important</h3>
+
+
+<p>A zombie is <strong>not running</strong>.</p>
+
+
+<p>It is essentially:</p>
+
+
+<blockquote>
+<p><strong>Finished process + remaining process-table entry</strong></p>
+</blockquote>
+
+
+<h3>🔥 Follow-up</h3>
+
+
+<p><strong>Why does a zombie exist?</strong></p>
+
+
+<blockquote>
+<p><strong>Because the OS needs to retain the child&#39;s termination status until the parent retrieves it.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>19. What is an Orphan Process?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p>An orphan process is a process whose parent has terminated while the child is still running. The operating system then reassigns or adopts the orphan under another system process so that it can continue to be managed properly.</p>
+</div></div>
+
+<h3>Example</h3>
+
+
+<pre class="language-text"><code class="language-text">Parent
+  │
+  └── Child
+        │
+        │ Parent terminates
+        ↓
+      Orphan
+        │
+        ↓
+ Adopted by another system process</code></pre>
+
+<h3>⭐ Zombie vs Orphan</h3>
+
+
+<p>This is an excellent interview follow-up.</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Zombie</th>
+<th>Orphan</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Child has <strong>finished</strong></td>
+<td>Child is <strong>still running</strong></td>
+</tr>
+<tr>
+<td>Parent hasn&#39;t collected exit status</td>
+<td>Parent has terminated</td>
+</tr>
+<tr>
+<td>Process is no longer executing</td>
+<td>Process continues executing</td>
+</tr>
+<tr>
+<td>Waiting to be reaped</td>
+<td>Gets adopted/re-parented</td>
+</tr>
+</tbody></table>
+
+
+<h3>🧠 Easy memory trick</h3>
+
+
+<p><strong>Zombie → Child died, parent hasn&#39;t collected it.</strong></p>
+
+
+<p><strong>Orphan → Parent died, child is still alive.</strong></p>
+
+
+<hr>
+
+
+<h1>20. What is the difference between Concurrency and Parallelism? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is <strong>very important</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>Concurrency means multiple tasks are making progress during overlapping periods, while parallelism means multiple tasks are actually executing at the same time, typically on different CPU cores.</p>
+<p>Concurrency can happen even on a single CPU core through techniques such as context switching. Parallelism generally requires multiple execution units, such as multiple CPU cores, to execute tasks simultaneously.</p>
+</div></div>
+
+<h3>🔥 Example: Single Core</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Task A
+Task B
+Task C</code></pre>
+
+<p>One CPU core:</p>
+
+
+<pre class="language-text"><code class="language-text">CPU Core
+
+A → B → A → C → B → A → ...</code></pre>
+
+<p>Only one task is executing at any instant.</p>
+
+
+<p>But all three tasks are <strong>making progress over time</strong>.</p>
+
+
+<p>That&#39;s:</p>
+
+
+<blockquote>
+<p><strong>Concurrency</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h3>🔥 Example: Multiple Cores</h3>
+
+
+<p>Suppose you have 3 CPU cores:</p>
+
+
+<pre class="language-text"><code class="language-text">Core 1 → Task A
+Core 2 → Task B
+Core 3 → Task C</code></pre>
+
+<p>A, B and C can actually execute simultaneously.</p>
+
+
+<p>That&#39;s:</p>
+
+
+<blockquote>
+<p><strong>Parallelism</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>🧠 The easiest way to remember</h1>
+
+
+<h3>Concurrency</h3>
+
+
+<blockquote>
+<p><strong>&quot;Dealing with multiple tasks.&quot;</strong></p>
+</blockquote>
+
+
+<h3>Parallelism</h3>
+
+
+<blockquote>
+<p><strong>&quot;Doing multiple tasks at the same time.&quot;</strong></p>
+</blockquote>
+
+
+<p>A common analogy:</p>
+
+
+<h3>🍳 One chef</h3>
+
+
+<p>The chef:</p>
+
+
+<pre class="language-text"><code class="language-text">Cook eggs
+ ↓
+Start toast
+ ↓
+Check eggs
+ ↓
+Make coffee
+ ↓
+Check toast</code></pre>
+
+<p>One person is managing multiple tasks.</p>
+
+
+<p><strong>Concurrency.</strong></p>
+
+
+<h3>👨‍🍳👨‍🍳 Multiple chefs</h3>
+
+
+<pre class="language-text"><code class="language-text">Chef 1 → Eggs
+Chef 2 → Toast
+Chef 3 → Coffee</code></pre>
+
+<p>Tasks happen simultaneously.</p>
+
+
+<p><strong>Parallelism.</strong></p>
+
+
+<hr>
+
+
+<h1>🔥 Q16–Q20 Summary</h1>
+
+
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Core idea</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>16. Child creation</strong></td>
+<td>Parent creates a separate child process</td>
+</tr>
+<tr>
+<td><strong>17. Parent vs Child</strong></td>
+<td>Creator vs created process</td>
+</tr>
+<tr>
+<td><strong>18. Zombie</strong></td>
+<td>Child finished, parent hasn&#39;t collected status</td>
+</tr>
+<tr>
+<td><strong>19. Orphan</strong></td>
+<td>Parent finished, child still running</td>
+</tr>
+<tr>
+<td><strong>20. Concurrency vs Parallelism</strong></td>
+<td>Overlapping progress vs actual simultaneous execution</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h2>🎯 We&#39;ve now completed Q1–Q20</h2>
+
+
+<p>You&#39;ve covered the entire <strong>Processes &amp; Threads</strong> foundation:</p>
+
+
+<pre class="language-text"><code class="language-text">OS
+ ↓
+Process
+ ├── PCB
+ ├── PID
+ ├── States
+ └── Context Switching
+       ↓
+     Thread
+       ↓
+  Multithreading
+       ↓
+Concurrency / Parallelism
+       ↓
+Parent / Child
+       ↓
+Zombie / Orphan</code></pre>
+
+<p>Yep. 😎 We&#39;ve finished <strong>Q1–Q20</strong>, so now we move to <strong>Q21–Q25: CPU Scheduling</strong>.</p>
+
+
+<p>This section answers a fundamental OS question:</p>
+
+
+<blockquote>
+<p><strong>&quot;If multiple processes want the CPU, who gets it, and for how long?&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>21. What is CPU Scheduling?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>CPU scheduling is the process of selecting a process or thread from the ready queue and allocating the CPU to it. Since multiple processes may be ready to execute at the same time, the operating system uses scheduling algorithms to decide which one should run next.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue:
+
+P1
+P2
+P3
+P4</code></pre>
+
+<p>But you have only one CPU core.</p>
+
+
+<p>The OS needs to decide:</p>
+
+
+<pre class="language-text"><code class="language-text">Who gets the CPU first?
+        ↓
+      P2</code></pre>
+
+<p>Then after P2:</p>
+
+
+<pre class="language-text"><code class="language-text">P2 → P4 → P1 → P3</code></pre>
+
+<p>The <strong>scheduler</strong> makes these decisions.</p>
+
+
+<h3>🎯 Why do we need CPU scheduling?</h3>
+
+
+<p>Because we want to:</p>
+
+
+<ul>
+<li>Keep the CPU busy</li>
+<li>Improve response time</li>
+<li>Reduce waiting time</li>
+<li>Improve throughput</li>
+<li>Provide fairness</li>
+</ul>
+
+
+<hr>
+
+
+<h1>22. What is a Scheduler?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A scheduler is an operating-system component that decides which process or thread should be selected for execution from the available processes. The short-term scheduler, also called the CPU scheduler, selects a ready process or thread and gives it the CPU.</strong></p>
+</blockquote>
+
+
+<p>Think:</p>
+
+
+<pre class="language-text"><code class="language-text">           Ready Queue
+        ┌───┬───┬───┬───┐
+        │ P1│ P2│ P3│ P4│
+        └───┴───┴───┴───┘
+                 │
+                 ↓
+             Scheduler
+                 │
+                 ↓
+                CPU</code></pre>
+
+<h3>🔥 Scheduler vs Scheduling</h3>
+
+
+<p>Don&#39;t confuse these:</p>
+
+
+<p><strong>Scheduler</strong> → the component making the decision.</p>
+
+
+<p><strong>Scheduling</strong> → the process of deciding who gets the CPU.</p>
+
+
+<hr>
+
+
+<h1>23. What are the different types of schedulers?</h1>
+
+
+<p>There are traditionally <strong>three types</strong> you should know.</p>
+
+
+<h3>1. Long-Term Scheduler</h3>
+
+
+<p>Also called the <strong>job scheduler</strong>.</p>
+
+
+<p>It decides:</p>
+
+
+<blockquote>
+<p><strong>Which jobs/processes should be admitted into the system for execution?</strong></p>
+</blockquote>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Jobs on disk
+     ↓
+Long-term scheduler
+     ↓
+Processes in memory</code></pre>
+
+<p>It controls the <strong>degree of multiprogramming</strong> — roughly, how many processes are admitted to the system.</p>
+
+
+<hr>
+
+
+<h3>2. Short-Term Scheduler ⭐⭐⭐⭐⭐</h3>
+
+
+<p>Also called the <strong>CPU scheduler</strong>.</p>
+
+
+<p>It decides:</p>
+
+
+<blockquote>
+<p><strong>Which ready process/thread should get the CPU next?</strong></p>
+</blockquote>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue
+    ↓
+Short-term scheduler
+    ↓
+CPU</code></pre>
+
+<p>This scheduler runs <strong>very frequently</strong>, so it needs to be fast.</p>
+
+
+<hr>
+
+
+<h3>3. Medium-Term Scheduler</h3>
+
+
+<p>It can temporarily remove processes from memory and later bring them back.</p>
+
+
+<p>This is associated with <strong>swapping</strong>.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Memory
+  ↓
+Medium-term scheduler
+  ↓
+Temporarily remove process
+  ↓
+Disk</code></pre>
+
+<p>Later:</p>
+
+
+<pre class="language-text"><code class="language-text">Disk
+ ↓
+Memory</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>&quot;Traditionally, operating systems describe three types of schedulers: the long-term scheduler, which controls which jobs are admitted; the short-term scheduler, which selects the next ready process or thread for the CPU; and the medium-term scheduler, which can temporarily suspend or swap processes to manage memory and the degree of multiprogramming.&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>24. What is Preemptive vs Non-Preemptive Scheduling? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is <strong>very important</strong>.</p>
+
+
+<p>The question is basically:</p>
+
+
+<blockquote>
+<p><strong>Can the OS take the CPU away from a running process?</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h2>🟢 Non-Preemptive Scheduling</h2>
+
+
+<p>Once a process gets the CPU:</p>
+
+
+<blockquote>
+<p><strong>It keeps the CPU until it finishes or voluntarily blocks/waits.</strong></p>
+</blockquote>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 gets CPU
+      ↓
+P1 keeps CPU
+      ↓
+P1 finishes
+      ↓
+P2 gets CPU</code></pre>
+
+<p>The OS doesn&#39;t forcibly interrupt P1 just because another process has become ready.</p>
+
+
+<p>Examples:</p>
+
+
+<ul>
+<li>FCFS</li>
+<li>Traditional non-preemptive SJF</li>
+</ul>
+
+
+<hr>
+
+
+<h2>🔴 Preemptive Scheduling</h2>
+
+
+<p>The OS <strong>can interrupt a running process</strong> and give the CPU to another process.</p>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 running
+   ↓
+Timer interrupt
+   ↓
+OS scheduler
+   ↓
+P1 paused
+   ↓
+P2 gets CPU</code></pre>
+
+<p>This is how systems can provide responsive multitasking.</p>
+
+
+<p>Examples:</p>
+
+
+<ul>
+<li>Round Robin</li>
+<li>SRTF</li>
+<li>Preemptive Priority Scheduling</li>
+</ul>
+
+
+<hr>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>&quot;In preemptive scheduling, the operating system can interrupt a running process and allocate the CPU to another process. In non-preemptive scheduling, once a process gets the CPU, it generally keeps it until it finishes or blocks voluntarily. Preemptive scheduling generally provides better responsiveness, but it introduces additional context-switching overhead.&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>25. What is FCFS Scheduling?</h1>
+
+
+<p><strong>FCFS = First Come, First Served</strong></p>
+
+
+<p>It&#39;s one of the simplest CPU scheduling algorithms.</p>
+
+
+<p>The rule is:</p>
+
+
+<blockquote>
+<p><strong>The process that arrives first gets the CPU first.</strong></p>
+</blockquote>
+
+
+<p>Just like standing in a queue.</p>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue:
+
+P1 → P2 → P3 → P4
+
+CPU:
+
+P1 → P2 → P3 → P4</code></pre>
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th align="right">Arrival Time</th>
+<th align="right">Burst Time</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td align="right">0</td>
+<td align="right">5</td>
+</tr>
+<tr>
+<td>P2</td>
+<td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>P3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+</tbody></table>
+
+
+<p>FCFS gives:</p>
+
+
+<pre class="language-text"><code class="language-text">0        5        8       10
+|--------|--------|--------|
+   P1       P2       P3</code></pre>
+
+<p>P1 arrives first → runs first.</p>
+
+
+<p>Then P2.</p>
+
+
+<p>Then P3.</p>
+
+
+<hr>
+
+
+<h2>🔥 The major problem with FCFS</h2>
+
+
+<p>Imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 = 20 seconds
+P2 = 2 seconds
+P3 = 2 seconds</code></pre>
+
+<p>And they arrive in that order.</p>
+
+
+<p>FCFS:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 ────────────────────
+                       P2 ──
+                            P3 ──</code></pre>
+
+<p>P2 and P3 are tiny jobs, but they have to wait for the huge P1.</p>
+
+
+<p>This is called the:</p>
+
+
+<h1><strong>Convoy Effect</strong></h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>&quot;FCFS is a non-preemptive scheduling algorithm where processes are executed in their order of arrival. It is simple and fair in terms of arrival order, but it can cause high waiting time and the convoy effect, where short processes are forced to wait behind a long-running process.&quot;</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>🧠 Today&#39;s 5 concepts together</h1>
+
+
+<pre class="language-text"><code class="language-text">              CPU Scheduling
+                    │
+                    ↓
+             Ready Queue
+                    │
+                    ↓
+               Scheduler
+                    │
+                    ↓
+             Select process
+                    │
+          ┌─────────┴─────────┐
+          ↓                   ↓
+    Non-Preemptive       Preemptive
+          │                   │
+          ↓                   ↓
+    Keeps CPU          Can interrupt
+          │                   │
+          ↓                   ↓
+        FCFS              Round Robin
+                           SRTF</code></pre>
+
+<p>And remember:</p>
+
+
+<blockquote>
+<p><strong>Scheduler = who decides</strong> <strong>Scheduling = decision process</strong> <strong>Preemptive = OS can take CPU away</strong> <strong>Non-preemptive = process keeps CPU until it finishes/blocks</strong> <strong>FCFS = first arrival runs first</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>26. What is SJF Scheduling?</h1>
+
+
+<p><strong>SJF = Shortest Job First</strong></p>
+
+
+<p>The idea is simple:</p>
+
+
+<blockquote>
+<p><strong>Among the available processes, the process with the shortest CPU burst time is selected first.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th align="right">Burst Time</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td align="right">8 ms</td>
+</tr>
+<tr>
+<td>P2</td>
+<td align="right">3 ms</td>
+</tr>
+<tr>
+<td>P3</td>
+<td align="right">5 ms</td>
+</tr>
+<tr>
+<td>P4</td>
+<td align="right">2 ms</td>
+</tr>
+</tbody></table>
+
+
+<p>SJF chooses:</p>
+
+
+<pre class="language-text"><code class="language-text">P4 → P2 → P3 → P1
+ 2     3     5     8</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>SJF, or Shortest Job First, is a CPU scheduling algorithm that selects the process with the shortest expected CPU burst time among the available processes. It can minimize average waiting time when burst times are known or estimated, but accurately knowing the future CPU burst time can be difficult.</strong></p>
+</blockquote>
+
+
+<div class="callout callout-important"><div class="callout-title"><span class="callout-icon">⭐</span><span>Important point ⚠️</span></div><div class="callout-body"><p>Traditional SJF is <strong>non-preemptive</strong>.</p>
+<p>Once a process starts:</p>
+<pre class="language-text"><code class="language-text">P1 running
+   ↓
+P1 continues
+   ↓
+P1 finishes
+   ↓
+Next process</code></pre></div></div>
+<h1>27. What is SRTF Scheduling?</h1>
+
+
+<p><strong>SRTF = Shortest Remaining Time First</strong></p>
+
+
+<p>Think of it as:</p>
+
+
+<blockquote>
+<p><strong>Preemptive version of SJF.</strong></p>
+</blockquote>
+
+
+<p>Instead of asking:</p>
+
+
+<blockquote>
+<p>&quot;Which process has the shortest total burst time?&quot;</p>
+</blockquote>
+
+
+<p>we ask:</p>
+
+
+<blockquote>
+<p><strong>&quot;Which available process has the shortest remaining execution time?&quot;</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 arrives at time 0
+Burst = 8</code></pre>
+
+<p>So:</p>
+
+
+<pre class="language-text"><code class="language-text">Time 0 → P1 starts</code></pre>
+
+<p>At time 2:</p>
+
+
+<pre class="language-text"><code class="language-text">P2 arrives
+Burst = 3</code></pre>
+
+<p>P1 has:</p>
+
+
+<pre class="language-text"><code class="language-text">8 - 2 = 6 ms remaining</code></pre>
+
+<p>P2 needs:</p>
+
+
+<pre class="language-text"><code class="language-text">3 ms</code></pre>
+
+<p>So SRTF says:</p>
+
+
+<blockquote>
+<p>&quot;P2 needs less time. I&#39;ll pause P1.&quot;</p>
+</blockquote>
+
+
+<pre class="language-text"><code class="language-text">P1 running
+   ↓
+P2 arrives
+   ↓
+P1 paused
+   ↓
+P2 runs
+   ↓
+P2 finishes
+   ↓
+P1 resumes</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>SRTF, or Shortest Remaining Time First, is the preemptive version of SJF. The scheduler always selects the available process with the shortest remaining CPU burst time. If a new process arrives with a shorter remaining time than the currently running process, the current process can be preempted.</strong></p>
+</blockquote>
+
+
+<h3>🧠 Remember</h3>
+
+
+<pre class="language-text"><code class="language-text">SJF  → Shortest Job → Non-preemptive
+SRTF → Shortest Remaining Time → Preemptive</code></pre>
+
+<hr>
+
+
+<h1>28. What is Round Robin Scheduling? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>This is <strong>very commonly asked</strong>.</p>
+
+
+<p>Round Robin is designed particularly for <strong>time-sharing systems</strong>.</p>
+
+
+<p>The key concept is:</p>
+
+
+<blockquote>
+<p><strong>Each process gets a fixed amount of CPU time called a time quantum/time slice.</strong></p>
+</blockquote>
+
+
+<p>Imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">Ready Queue:
+
+P1 → P2 → P3</code></pre>
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Time quantum = 2 ms</code></pre>
+
+<p>Then:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → 2 ms
+P2 → 2 ms
+P3 → 2 ms
+P1 → 2 ms
+P2 → 2 ms
+P3 → 2 ms
+...</code></pre>
+
+<p>It&#39;s like everyone gets a turn.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Round Robin is a preemptive CPU scheduling algorithm where each ready process is given a fixed time quantum. When its time quantum expires, the process is preempted and moved to the back of the ready queue if it still has work to do. This provides fairness and good responsiveness for interactive systems.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h2>🔥 What happens if the time quantum is too small?</h2>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">Time quantum = 1 ms</code></pre>
+
+<p>Then:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → P2 → P3 → P1 → P2 → P3 → ...</code></pre>
+
+<p>There will be lots of context switches.</p>
+
+
+<p>That creates <strong>context-switching overhead</strong>.</p>
+
+
+<h3>What if the time quantum is too large?</h3>
+
+
+<p>Round Robin starts behaving more like <strong>FCFS</strong> because processes may run for long periods before another process gets a turn.</p>
+
+
+<p>So there is a trade-off.</p>
+
+
+<hr>
+
+
+<h1>29. What is Priority Scheduling?</h1>
+
+
+<p>Here the scheduler gives preference based on <strong>priority</strong>.</p>
+
+
+<p>For example:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → Priority 3
+P2 → Priority 1
+P3 → Priority 2</code></pre>
+
+<p>Assuming <strong>smaller number means higher priority</strong>:</p>
+
+
+<pre class="language-text"><code class="language-text">P2 → P3 → P1</code></pre>
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Priority scheduling is a scheduling algorithm where each process is assigned a priority, and the scheduler selects a process based on that priority. It can be implemented as either preemptive or non-preemptive scheduling. A problem with priority scheduling is that low-priority processes may wait indefinitely if higher-priority processes keep arriving.</strong></p>
+</blockquote>
+
+
+<p>That problem is called:</p>
+
+
+<h1><strong>Starvation</strong></h1>
+
+
+<hr>
+
+
+<h1>30. What is Starvation and how can it be prevented?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Starvation occurs when a process waits for a very long time, potentially indefinitely, because other processes keep getting preference for the required resource, such as CPU time.</strong></p>
+<p><strong>One common way to prevent starvation is aging, where the priority of a waiting process is gradually increased over time so that it eventually gets a chance to execute.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 → Low priority</code></pre>
+
+<p>But new high-priority processes keep arriving:</p>
+
+
+<pre class="language-text"><code class="language-text">High → High → High → High → High → ...</code></pre>
+
+<p>P1 keeps waiting:</p>
+
+
+<pre class="language-text"><code class="language-text">P1
+ ↓
+waiting...
+ ↓
+waiting...
+ ↓
+waiting...</code></pre>
+
+<p>😢</p>
+
+
+<p>That&#39;s starvation.</p>
+
+
+<h3>Aging</h3>
+
+
+<p>We gradually increase P1&#39;s priority:</p>
+
+
+<pre class="language-text"><code class="language-text">P1 priority = 10
+       ↓
+waits
+       ↓
+priority = 8
+       ↓
+waits
+       ↓
+priority = 5
+       ↓
+waits
+       ↓
+priority = 1
+       ↓
+P1 gets CPU</code></pre>
+
+<p>The exact priority direction depends on the scheduling convention, but the idea is:</p>
+
+
+<blockquote>
+<p><strong>The longer a process waits, the more its priority is boosted.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>🧠 Q26–Q30 Cheat Sheet</h1>
+
+
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Main idea</th>
+<th>Preemptive?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SJF</strong></td>
+<td>Shortest job first</td>
+<td>❌ Usually no</td>
+</tr>
+<tr>
+<td><strong>SRTF</strong></td>
+<td>Shortest remaining time first</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td><strong>Round Robin</strong></td>
+<td>Each process gets a time quantum</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td>Highest-priority process first</td>
+<td>Either</td>
+</tr>
+<tr>
+<td><strong>Starvation</strong></td>
+<td>Process waits indefinitely due to repeated preference for others</td>
+<td>Problem</td>
+</tr>
+</tbody></table>
+
+
+<hr>
+
+
+<h2>🎯 One thing to be very clear about</h2>
+
+
+<p>Don&#39;t confuse <strong>starvation</strong> with <strong>deadlock</strong>.</p>
+
+
+<h3>Starvation</h3>
+
+
+<blockquote>
+<p>A process <strong>can potentially run</strong>, but keeps getting denied because other processes are preferred.</p>
+</blockquote>
+
+
+<h3>Deadlock</h3>
+
+
+<blockquote>
+<p>Processes are <strong>stuck waiting for each other/resources</strong>, so none of them can proceed.</p>
+</blockquote>
+
+
+<p>We&#39;ll tackle deadlock properly later.</p>
+
+
+<hr>
+
+
+<h3>🧪 Quick interview test</h3>
+
+
+<p>Try these without looking back:</p>
+
+
+<p><strong>1. SJF vs SRTF — what&#39;s the difference?</strong></p>
+
+
+<p><strong>2. Why does Round Robin need a time quantum?</strong></p>
+
+
+<p><strong>3. What happens if Round Robin&#39;s time quantum is extremely small?</strong></p>
+
+
+<p><strong>4. What is starvation?</strong></p>
+
+
+<p><strong>5. How does aging solve starvation?</strong></p>
+
+
+<p>Absolutely. 🔥 Now we&#39;re entering one of the <strong>highest-value OS topics for SDE interviews: Synchronization</strong>.</p>
+
+
+<p>We&#39;ll cover <strong>Q31–Q35</strong>:</p>
+
+
+<ol>
+<li>Race Condition</li>
+<li>Critical Section</li>
+<li>Process/Thread Synchronization</li>
+<li>Mutex</li>
+<li>Semaphore</li>
+</ol>
+
+
+<p>The key is to understand how these five concepts connect.</p>
+
+
+<hr>
+
+
+<h1>31. What is a Race Condition? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>A race condition occurs when <strong>multiple threads/processes access shared data concurrently, and the final result depends on the order/timing of their execution</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A race condition occurs when multiple threads access and modify shared data concurrently, and the final result depends on the timing or order in which the threads execute. This can lead to incorrect or unpredictable results.</strong></p>
+<p><strong>It can be prevented by properly synchronizing access to the shared resource.</strong></p>
+</blockquote>
+
+
+<h3>Let&#39;s understand it with Java</h3>
+
+
+<p>Suppose:</p>
+
+
+<pre class="language-java"><code class="language-java"><span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span></code></pre>
+
+<p>Two threads execute:</p>
+
+
+<pre class="language-java"><code class="language-java">count<span class="token operator">++</span><span class="token punctuation">;</span></code></pre>
+
+<p>You might think:</p>
+
+
+<pre class="language-text"><code class="language-text">0 → 1 → 2</code></pre>
+
+<p>So the answer should be <code>2</code>.</p>
+
+
+<p>But <code>count++</code> is <strong>not one indivisible operation</strong>.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Read count
+   ↓
+Add 1
+   ↓
+Write count</code></pre>
+
+<p>Now imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">Initial count = 0
+
+Thread 1: Read 0
+Thread 2: Read 0
+
+Thread 1: Add 1 → 1
+Thread 2: Add 1 → 1
+
+Thread 1: Write 1
+Thread 2: Write 1</code></pre>
+
+<p>Final result:</p>
+
+
+<pre class="language-text"><code class="language-text">count = 1 ❌</code></pre>
+
+<p>Even though two increments happened.</p>
+
+
+<p>That&#39;s a <strong>race condition</strong>.</p>
+
+
+<h3>🧠 Remember</h3>
+
+
+<blockquote>
+<p><strong>Race condition = result depends on who gets there first.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>32. What is a Critical Section? ⭐⭐⭐⭐⭐</h1>
+
+
+<p>A <strong>critical section</strong> is the part of a program where shared data/resource is accessed or modified and therefore needs controlled access.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A critical section is a section of code that accesses shared resources and must be executed in a controlled manner so that multiple threads do not simultaneously perform conflicting operations on the shared resource.</strong></p>
+</blockquote>
+
+
+<p>Example:</p>
+
+
+<pre class="language-java"><code class="language-java">balance <span class="token operator">=</span> balance <span class="token operator">-</span> <span class="token number">500</span><span class="token punctuation">;</span></code></pre>
+
+<p>If multiple threads can modify <code>balance</code>, this operation may need to be protected.</p>
+
+
+<p>Conceptually:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1
+   ↓
+┌──────────────────┐
+│ Critical Section │
+│                  │
+│ modify balance   │
+│                  │
+└──────────────────┘</code></pre>
+
+<p>The goal is generally:</p>
+
+
+<blockquote>
+<p><strong>Only one thread at a time should execute the conflicting critical section.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h2>🔥 Critical Section vs Race Condition</h2>
+
+
+<p>Don&#39;t confuse them.</p>
+
+
+<p><strong>Critical section</strong> = the <strong>code region</strong> accessing shared data.</p>
+
+
+<p><strong>Race condition</strong> = the <strong>problem</strong> that can happen when concurrent access isn&#39;t properly controlled.</p>
+
+
+<pre class="language-text"><code class="language-text">Shared resource
+      ↓
+Critical Section
+      ↓
+Improper concurrent access
+      ↓
+Race Condition ❌</code></pre>
+
+<hr>
+
+
+<h1>33. What is Process/Thread Synchronization?</h1>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>Synchronization is the coordination of multiple processes or threads when they access shared resources, so that their operations occur safely and consistently without causing race conditions or data corruption.</strong></p>
+<p><strong>Operating systems and programming languages provide mechanisms such as mutexes, semaphores, monitors, and locks to achieve synchronization.</strong></p>
+</blockquote>
+
+
+<h3>Why do we need it?</h3>
+
+
+<p>Imagine:</p>
+
+
+<pre class="language-text"><code class="language-text">Bank balance = ₹1000
+
+Thread A → withdraw ₹700
+Thread B → withdraw ₹500</code></pre>
+
+<p>Both threads access the same balance.</p>
+
+
+<p>Without synchronization:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread A ──┐
+           ├──→ Shared Balance
+Thread B ──┘</code></pre>
+
+<p>They can interfere with each other.</p>
+
+
+<p>With synchronization:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread A
+   ↓
+[LOCK]
+   ↓
+Modify balance
+   ↓
+[UNLOCK]
+   ↓
+Thread B</code></pre>
+
+<hr>
+
+
+<h1>34. What is a Mutex? 🔒 ⭐⭐⭐⭐⭐</h1>
+
+
+<p><strong>Mutex = Mutual Exclusion</strong></p>
+
+
+<p>The easiest way to understand a mutex:</p>
+
+
+<blockquote>
+<p><strong>A mutex is a lock that allows only one thread at a time to enter a protected critical section.</strong></p>
+</blockquote>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A mutex, or mutual exclusion lock, is a synchronization mechanism used to protect shared resources. At most one thread can hold the mutex at a time. A thread must acquire the mutex before entering the protected critical section and release it after finishing.</strong></p>
+</blockquote>
+
+
+<p>Example:</p>
+
+
+<pre class="language-text"><code class="language-text">             Mutex
+               🔒
+                │
+        ┌───────┴───────┐
+        ↓               ↓
+    Thread A          Thread B
+        │               │
+     acquire         waiting
+        │
+        ↓
+ Critical Section
+        │
+      release
+        │
+        ↓
+                    Thread B
+                    acquire</code></pre>
+
+<p>So:</p>
+
+
+<blockquote>
+<p><strong>Thread A has the lock → Thread B waits.</strong></p>
+</blockquote>
+
+
+<hr>
+
+
+<h1>35. What is a Semaphore? 🚦 ⭐⭐⭐⭐⭐</h1>
+
+
+<p>A semaphore is another synchronization mechanism, but its model is different from a mutex.</p>
+
+
+<p>Think of a semaphore as a <strong>counter representing available permits/resources</strong>.</p>
+
+
+<h3>🎤 Interview answer</h3>
+
+
+<blockquote>
+<p><strong>A semaphore is a synchronization mechanism that maintains a count of available permits. A thread acquires a permit before accessing a limited resource and releases it when it is finished. If no permit is available, the thread waits. A counting semaphore can therefore allow a limited number of threads to access a resource concurrently.</strong></p>
+</blockquote>
+
+
+<h3>Example</h3>
+
+
+<p>Suppose a server has <strong>3 database connections</strong> available.</p>
+
+
+<pre class="language-text"><code class="language-text">Semaphore = 3</code></pre>
+
+<p>Then:</p>
+
+
+<pre class="language-text"><code class="language-text">Thread 1 → gets connection
+Thread 2 → gets connection
+Thread 3 → gets connection</code></pre>
+
+<p>Now:</p>
+
+
+<pre class="language-text"><code class="language-text">Semaphore = 0</code></pre>
+
+<p>Thread 4 has to wait.</p>
+
+
+<p>When Thread 1 releases its connection:</p>
+
+
+<pre class="language-text"><code class="language-text">Semaphore = 1</code></pre>
+
+<p>Thread 4 can acquire it.</p>
+
+
+<hr>
+
+
+<h1>🔥 Mutex vs Semaphore</h1>
+
+
+<p>This is a <strong>very common interview follow-up</strong>.</p>
+
+
+<table>
+<thead>
+<tr>
+<th>Mutex</th>
+<th>Semaphore</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Primarily provides mutual exclusion</td>
+<td>Controls access using permits/count</td>
+</tr>
+<tr>
+<td>Usually one thread owns the lock at a time</td>
+<td>Can allow multiple concurrent holders</td>
+</tr>
+<tr>
+<td>Commonly used to protect a critical section</td>
+<td>Commonly used to control a limited resource</td>
+</tr>
+<tr>
+<td>Ownership is typically associated with the locking thread</td>
+<td>No equivalent ownership requirement in the basic semaphore model</td>
+</tr>
+<tr>
+<td>Usually binary: locked/unlocked</td>
+<td>Can be binary or counting</td>
+</tr>
+</tbody></table>
+
+
+<h3>Example</h3>
+
+
+<p><strong>Mutex:</strong></p>
+
+
+<pre class="language-text"><code class="language-text">One bathroom 🚪
+
+Only ONE person at a time.</code></pre>
+
+<p><strong>Semaphore:</strong></p>
+
+
+<pre class="language-text"><code class="language-text">Parking lot 🅿️
+
+5 spaces available.
+
+5 cars → allowed
+6th car → waits</code></pre>
+
+<p>That&#39;s a very useful mental model.</p>
+
+
+<h1>36. What is a Deadlock? ⭐⭐⭐⭐⭐</h1>
+
+
+<div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p>A deadlock is a situation where a set of processes or threads are permanently blocked because each one is waiting for a resource held by another process or thread in the same set.</p>
+</div></div>
+
+<h1>37. What are the necessary conditions for Deadlock? ⭐⭐⭐⭐⭐</h1>
+
+
+<blockquote>
+<p>Mutual Exclusion + Hold and Wait + No Preemption + Circular Wait</p>
+</blockquote>
+
+
+<h3><code>Mutual Exclusion</code></h3>
+
+
+<ul>
+<li>A resource can be used by only one process at a time.</li>
+</ul>
+
+
+<h3><code>Hold and Wait</code></h3>
+
+
+<ul>
+<li>A process is holding one resource while waiting for another.</li>
+</ul>
+
+
+<h3><code>No Preemption</code></h3>
+
+
+<ul>
+<li>The OS cannot forcibly take the resource away from the process; the process must release it voluntarily.</li>
+</ul>
+
+
+<h3><code>Circular Wait</code></h3>
+
+
+<ul>
+<li>A circular chain of processes exists where each process waits for a resource held by the next.</li>
+</ul>
+
+
+<div class="callout callout-note"><div class="callout-title"><span class="callout-icon">📝</span><span>Notes</span></div><div class="callout-body"><p>The four necessary conditions for deadlock are mutual exclusion, hold and wait, no preemption, and circular wait. <strong>Deadlock can occur only when all four conditions exist simultaneously</strong>.</p>
+</div></div>
+
+<h1>38. What is the difference between Deadlock and Starvation?</h1>
+
+
+<h3><code>Deadlock</code></h3>
+
+
+<ul>
+<li>Processes are stuck waiting for each other.</li>
+</ul>
+
+
+<h3><code>Starvation</code></h3>
+
+
+<ul>
+<li>A process keeps getting denied because other processes are repeatedly given preference.</li>
+</ul>
+
+
+<div class="callout callout-purple" data-fence-callout="purple"><div class="callout-body"><p>In deadlock, a group of processes are permanently blocked because they are waiting for resources held by one another. In starvation, a process waits for an indefinite period because other processes keep receiving the required resource or CPU time. Aging is a common technique used to prevent starvation.</p>
+</div></div>
+
+<h1>39. How can Deadlock be prevented?</h1>
+
+
+<p>The key idea is:</p>
+
+<blockquote>
+<p>Deadlock requires all four conditions. So if we ensure at least one condition never occurs, deadlock cannot occur.</p>
+</blockquote>
+
+
+<div class="callout callout-teal" data-fence-callout="teal"><div class="callout-body"><p>Deadlock prevention works by ensuring that at least one of the four necessary conditions for deadlock cannot hold. For example, we can prevent hold-and-wait by requiring a process to request all required resources before execution, or prevent circular wait by imposing an ordering on resource acquisition.</p>
+</div></div>
+
+<h1>40. What is the difference between Deadlock Prevention and Deadlock Avoidance?</h1>
+
+
+<div class="callout callout-pink" data-fence-callout="pink"><div class="callout-body"><p>Deadlock prevention ensures that at least one of the necessary conditions for deadlock never holds. Deadlock avoidance is more dynamic: the operating system evaluates resource allocation requests and grants them only if the resulting state remains safe. Banker&#39;s Algorithm is a classic deadlock-avoidance algorithm.</p>
+</div></div>
+</article></main>
+</body>
+</html>
