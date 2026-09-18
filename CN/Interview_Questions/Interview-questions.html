@@ -133,8 +133,7 @@ tr:last-child td{border-bottom:0}
 </head>
 <body>
 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></button>
-<main class="page"><article class="doc">
-<h1>CN Interview Questions</h1>
+<main class="page"><article class="doc"><h1>CN Interview Questions</h1>
 
 
 <h3>What is a Computer Network?</h3>
@@ -145,6 +144,7 @@ tr:last-child td{border-bottom:0}
 
 <h3>LAN</h3>
 
+
 <blockquote>
 <p>A LAN is a network that connects devices within a limited geographical area, such as a home, office, or college.</p>
 </blockquote>
@@ -152,12 +152,14 @@ tr:last-child td{border-bottom:0}
 
 <h3>MAN</h3>
 
+
 <blockquote>
 <p>A MAN connects networks across a city or metropolitan area and is larger than a LAN but smaller than a WAN.</p>
 </blockquote>
 
 
 <h3>WAN</h3>
+
 
 <blockquote>
 <p>A WAN connects networks across large geographical areas, such as different cities, countries, or continents. The Internet is the largest example.</p>
@@ -167,14 +169,13 @@ tr:last-child td{border-bottom:0}
 <h3>Explain the OSI model.</h3>
 
 
-<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>The OSI model is a seven-layer conceptual framework used to standardize and understand network communication. From the top, the layers are Application, Presentation, Session, Transport, Network, Data Link, and Physical. The Application layer provides network services to applications, the Presentation layer handles data representation and encryption, the Session layer manages sessions, the Transport layer provides end-to-end communication using protocols such as TCP and UDP, the Network layer handles IP addressing and routing, the Data Link layer handles local delivery using MAC addresses and frames, and the Physical layer transmits raw bits through the physical medium.</p>
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>The OSI model is a seven-layer conceptual framework used to break network communication into separate responsibilities. Starting from the top, the Application layer provides network services such as HTTP and DNS. The Presentation layer deals with data representation, encryption, and compression, while the Session layer manages communication sessions. The Transport layer provides process-to-process communication using TCP or UDP and uses port numbers. The Network layer handles logical addressing and routing using IP. The Data Link layer handles local network delivery using concepts such as MAC addresses and frames. Finally, the Physical layer transmits raw bits through physical media such as cables, radio, or fiber.</p>
 </div></div>
 
 <h3>Explain the TCP/IP model.</h3>
 
 
-<div class="callout callout-purple" data-fence-callout="purple"><div class="callout-body"><p>The TCP/IP model is a practical networking model used to describe Internet communication. It is commonly represented using four layers: Application, Transport, Internet, and Network Access. The Application layer provides protocols such as HTTP and DNS, the Transport layer provides process-to-process communication using TCP or UDP, the Internet layer handles IP addressing and routing, and the Network Access layer handles local network communication and physical transmission.</p>
-</div></div>
-</article></main>
+<div class="callout callout-purple" data-fence-callout="purple"><div class="callout-body"><p>The TCP/IP model is a practical networking model used to describe communication over the Internet. The traditional model has four layers: Application, Transport, Internet, and Network Access. The Application layer provides protocols such as HTTP and DNS. The Transport layer provides process-to-process communication using TCP or UDP and uses port numbers. The Internet layer is responsible for logical addressing and routing using IP. The Network Access layer handles communication over the local network and physical transmission using technologies such as Ethernet and Wi-Fi. When data is sent, it moves down these layers and each layer adds its own control information, which is called encapsulation. At the receiver, the process happens in reverse, called decapsulation.</p>
+</div></div></article></main>
 </body>
 </html>
