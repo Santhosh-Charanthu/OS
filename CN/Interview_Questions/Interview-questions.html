@@ -212,6 +212,118 @@ tr:last-child td{border-bottom:0}
 
 <div class="callout callout-purple" data-fence-callout="purple"><div class="callout-body"><p>An IP address is a logical address used for communication and routing across networks, while a MAC address is a link-layer address used for delivering frames on a local network. IP addresses operate at the Network layer, while MAC addresses are associated with the Data Link layer.</p>
 </div></div>
+
+<h3>What is a Subnet Mask?</h3>
+
+
+<div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p>A subnet mask is used with an IPv4 address to determine which portion represents the network and which portion represents the host within that network.</p>
+</div></div>
+<p><strong>Example:</strong></p>
+
+
+<pre><code>IP Address:
+192.168.1.10
+
+Subnet Mask:
+255.255.255.0</code></pre>
+<pre><code>192.168.1 | 10
+  Network | Host</code></pre>
+
+<h3>What is a Default Gateway?</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>A default gateway is the device, usually a router, that a host sends packets to when the destination is outside its local network.</p>
+</div></div>
+
+<h3>t is a Private IP vs Public IP?</h3>
+
+
+<div class="callout callout-cyan" data-fence-callout="cyan"><div class="callout-body"><p>A private IP address is used for communication within private networks and is not directly routable over the public Internet. A public IP address is globally routable and is used to communicate across the Internet.</p>
+</div></div>
+
+<h3>What is DNS?</h3>
+
+
+<div class="callout callout-amber" data-fence-callout="amber"><div class="callout-body"><p>DNS is a distributed naming system that translates human-readable domain names into IP addresses, allowing clients to locate servers without remembering their numerical IP addresses.</p>
+</div></div>
+
+<h3>How Does DNS Resolution Work?</h3>
+
+
+<div class="callout callout-pink" data-fence-callout="pink"><div class="callout-body"><p>When a user enters a domain name such as google.com, the browser first checks its DNS cache, followed by the operating system&#39;s DNS cache. If the IP address isn&#39;t found, the request is sent to a recursive DNS resolver. The resolver checks its own cache and, if necessary, queries the DNS hierarchy. It first contacts a root DNS server, which points it to the appropriate TLD server, such as the .com server. The TLD server then points the resolver to the authoritative DNS server for the domain. The authoritative server returns the IP address, which is sent back to the client. The resolver may cache the result according to its TTL. Finally, the browser uses that IP address to establish a connection with the server.</p>
+</div></div>
+
+<h3>What is Hub?</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>A hub is a Layer 1 networking device used to connect multiple devices in a network. It receives data from one device and broadcasts it to all other connected devices. Since a hub doesn&#39;t examine MAC addresses or decide which device should receive the data, it can cause unnecessary network traffic and collisions.</p>
+</div></div>
+
+<h3>What is Switch?</h3>
+
+
+<div class="callout callout-purple" data-fence-callout="purple"><div class="callout-body"><p>A switch is a Layer 2 networking device that connects multiple devices in a LAN. It uses MAC addresses to identify devices and maintains a MAC address table that maps MAC addresses to switch ports. When a frame arrives, the switch checks the destination MAC address and forwards the frame only through the corresponding port instead of broadcasting it to every device.</p>
+</div></div>
+
+<h3>What is a Router?</h3>
+
+
+<div class="callout callout-teal" data-fence-callout="teal"><div class="callout-body"><p>A router is a Layer 3 networking device that connects different networks and forwards packets between them. It uses IP addresses to determine the destination network and selects an appropriate path for forwarding the packet. Routers maintain a routing table that contains information about available networks and the next hop to reach them.</p>
+</div></div>
+
+<h3>What is TCP?</h3>
+
+
+<div class="callout callout-pink" data-fence-callout="pink"><div class="callout-body"><p>TCP (Transmission Control Protocol) is a connection-oriented transport-layer protocol that provides reliable, ordered, and error-checked delivery of data between applications. It uses mechanisms such as acknowledgments, sequence numbers, retransmissions, flow control, and congestion control to provide reliable communication.</p>
+</div></div>
+
+<h3>What is UDP?</h3>
+
+
+<div class="callout callout-yellow" data-fence-callout="yellow"><div class="callout-body"><p>UDP (User Datagram Protocol) is a connectionless transport-layer protocol that provides a lightweight way to send datagrams without guaranteeing delivery, ordering, or retransmission.</p>
+</div></div>
+
+<h3>What is TCP 3-Way Handshake?</h3>
+
+
+<div class="callout callout-peach" data-fence-callout="peach"><div class="callout-body"><p>The TCP 3-way handshake is a three-step process used to establish a TCP connection between a client and server. The client first sends a SYN packet to request a connection. The server responds with a SYN-ACK, acknowledging the request and indicating that it is also ready to establish the connection. Finally, the client sends an ACK to acknowledge the server&#39;s response. After this, the TCP connection is established and data transmission can begin.</p>
+</div></div>
+
+<h3>How is a TCP Connection Terminated?</h3>
+
+
+<div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p>TCP connection termination is usually performed using a 4-way handshake. One side sends a FIN to indicate that it has finished sending data. The other side acknowledges it with an ACK. When the other side is also ready to close, it sends a FIN, and the first side responds with an ACK. After this, the TCP connection is closed.</p>
+</div></div>
+
+<h3>What is a Port?</h3>
+
+
+<div class="callout callout-cyan" data-fence-callout="cyan"><div class="callout-body"><p>A port number is a logical identifier used at the transport layer to identify a particular service or process on a host. It allows multiple network applications to communicate simultaneously using the same IP address.</p>
+</div></div>
+
+<h3>What is HTTP?</h3>
+
+
+<div class="callout callout-violet" data-fence-callout="violet"><div class="callout-body"><p>HTTP (HyperText Transfer Protocol) is an application-layer protocol used for communication between clients and servers, especially for web resources and APIs. It follows a request-response model.</p>
+</div></div>
+
+<h3>What is the difference between HTTP and HTTPS?</h3>
+
+
+<div class="callout callout-green" data-fence-callout="green"><div class="callout-body"><p>HTTP is an application-layer protocol used for communication between clients and servers. HTTPS is HTTP secured using Transport Layer Security. TLS provides encryption, integrity, and server authentication through certificates. In a typical HTTPS connection over TCP, the TCP connection is established first, followed by the TLS handshake, and then HTTP requests and responses are exchanged securely. HTTP commonly uses port 80, while HTTPS commonly uses port 443.</p>
+</div></div>
+
+<h3>What Happens When You Enter a URL in the Browser?</h3>
+
+
+<div class="callout callout-orange" data-fence-callout="orange"><div class="callout-body"><p>When I enter a URL, the browser first parses the URL to identify the protocol, domain, port, and path. It then performs DNS resolution to convert the domain name into an IP address. For HTTPS, the browser establishes a TCP connection using the TCP 3-way handshake and then performs a TLS handshake to establish secure communication. After that, it sends an HTTP request to the server. The request may pass through a load balancer or reverse proxy before reaching the backend application. The backend processes the request, possibly communicating with a database, and sends an HTTP response back. Finally, the browser processes the HTML, CSS, and JavaScript and renders the page.</p>
+</div></div>
+
+<h3>What is a Cookie?</h3>
+
+
+<div class="callout callout-teal" data-fence-callout="teal"><div class="callout-body"><p>A cookie is a small piece of data stored by the browser for a website. The server can set a cookie using the Set-Cookie response header, and the browser automatically sends the applicable cookie back with subsequent requests using the Cookie header. Cookies are commonly used for session management, authentication, and storing user preferences.</p>
+</div></div>
 </article></main>
 </body>
 </html>
